@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Ứng Viên</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 1000px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
+        .btn { padding: 8px 15px; text-decoration: none; border-radius: 5px; color: white; }
+        .btn-blue { background-color: #007bff; }
+        .btn-gray { background-color: #6c757d; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f8f9fa; }
+        
+        .status-pending { color: #ffc107; font-weight: bold; } /* Màu vàng */
+        .status-accepted { color: #28a745; font-weight: bold; } /* Màu xanh */
+        .status-rejected { color: #dc3545; font-weight: bold; } /* Màu đỏ */
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div>
+            <h2>👋 Xin chào, {{ request.user.username }}</h2>
+            <p>Đây là danh sách các công việc bạn đã ứng tuyển.</p>
+        </div>
+        <div>
+            <a href="{% url 'home' %}" class="btn btn-blue">🔍 Tìm việc mới</a>
+            <a href="#" class="btn btn-gray">Hồ sơ cá nhân</a>
+        </div>
+    </div>
+
+    <h3>📂 Lịch sử ứng tuyển</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Công ty</th>
+                <th>Vị trí</th>
+                <th>Ngày nộp</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for app in apps %}
+            <tr>
+                <td>{{ app.job.company_name }}</td>
+                <td>
+                    <strong>{{ app.job.title }}</strong>
+                </td>
+                <td>{{ app.applied_at|date:"d/m/Y H:i" }}</td>
+                <td>
+                    {% if app.status == 'Pending' %}
+                        <span class="status-pending">⏳ Đang chờ duyệt</span>
+                    {% elif app.status == 'Accepted' %}
+                        <span class="status-accepted">✅ Đã được nhận</span>
+                    {% else %}
+                        <span class="status-rejected">❌ Bị từ chối</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'job_detail' app.job.id %}" style="color: blue;">Xem lại Job</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 20px;">
+                    Bạn chưa nộp đơn vào công việc nào. <br>
+                    <a href="{% url 'home' %}">Ra trang chủ tìm việc ngay!</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Đăng ký Test</title>
+</head>
+<body>
+    <h2>Đăng ký tài khoản (Backend Test)</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color: green;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <button type="submit">Đăng ký ngay</button>
+    </form>
+</body>
+</html>

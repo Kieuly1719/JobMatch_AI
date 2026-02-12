@@ -89,6 +89,7 @@ class JobPost(models.Model):
     location = models.CharField(max_length=255, verbose_name="Địa điểm làm việc")
     deadline = models.DateField(null = True, blank = True)
     is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     interview_count = models.IntegerField(default=0, verbose_name="Số lượng đã nộp hồ sơ")
     full_text_search = models.TextField(blank=True, null=True)
@@ -110,3 +111,14 @@ class Application(models.Model):
 
     class Meta:
         unique_together = ('job', 'candidate')
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    message = models.CharField(max_length=255)
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    link = models.CharField(max_length=200, blank=True, null=True)
+
+    def __str__(self):
+        return f"Notif for {self.user.username}: {self.message}"

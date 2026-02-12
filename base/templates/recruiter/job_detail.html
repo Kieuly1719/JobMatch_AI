@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ job.title }} - Chi tiết</title>
+    <style>
+        body { font-family: sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; }
+        .header { border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
+        .company-name { color: #555; font-size: 1.2em; }
+        .meta-info { color: #777; margin-top: 10px; }
+        .section { margin-bottom: 20px; }
+        .section h3 { border-left: 4px solid #007bff; padding-left: 10px; }
+        
+        .btn-apply { display: inline-block; background-color: #28a745; color: white; padding: 15px 30px; text-decoration: none; font-size: 18px; border-radius: 5px; font-weight: bold; }
+        .btn-edit { background-color: #ffc107; color: black; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-right: 10px;}
+        .btn-delete { background-color: #dc3545; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+    <a href="{% url 'home' %}">← Về trang chủ</a>
+
+    <div class="header">
+        <h1>{{ job.title }}</h1>
+        <p class="company-name">{{ job.company_name }}</p>
+        
+        <div class="meta-info">
+            <span>Địa điểm: {{ job.location }}</span> | 
+            <span>Lương: {{ job.salary_range }}</span> | 
+            <span>Hạn nộp: {{ job.deadline|date:"d/m/Y" }}</span>
+        </div>
+    </div>
+
+    <div style="margin-bottom: 30px;">
+        {% if request.user == job.recruiter %}
+            <p>You are the owner of this post.</p>
+            <a href="{% url 'update_job' job.id %}" class="btn-edit">✏️ Sửa bài</a>
+            <a href="{% url 'delete_job' job.id %}" class="btn-delete">🗑️ Xóa bài</a>
+            <a href="{% url 'job_applicants' job.id %}" class="btn-edit" style="background-color: #17a2b8; color: white;">👥 Xem người ứng tuyển</a>
+        
+        {% elif request.user.role == 'candidate' %}
+            <form action="{% url 'apply_job' job.id %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" class="btn-apply" onclick="return confirm('Bạn có chắc muốn nộp hồ sơ vào vị trí này?')">
+                    🚀 Ứng tuyển ngay
+                </button>
+            </form>
+        {% else %}
+            <a href="{% url 'login' %}" class="btn-apply">Đăng nhập để ứng tuyển</a>
+        {% endif %}
+    </div>
+
+    <div class="section">
+        <h3>Mô tả công việc</h3>
+        <p>{{ job.description|linebreaks }}</p>
+    </div>
+
+    <div class="section">
+        <h3>Yêu cầu ứng viên</h3>
+        <p>{{ job.requirements|linebreaks }}</p>
+    </div>
+
+</body>
+</html>

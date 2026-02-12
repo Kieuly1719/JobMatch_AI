@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Ứng Viên</title>
+    <style>
+        body { font-family: sans-serif; margin: 0; background-color: #f4f4f4; }
+        
+        /* THANH MENU NGANG */
+        .navbar { background-color: #333; overflow: hidden; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;}
+        .navbar a { float: left; display: block; color: white; text-align: center; padding: 14px 16px; text-decoration: none; border-radius: 4px;}
+        .navbar a:hover { background-color: #ddd; color: black; }
+        .navbar a.active { background-color: #007bff; color: white; }
+        
+        .container { padding: 20px; max-width: 1000px; margin: 0 auto; }
+        
+        .job-card { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center;}
+        .job-info h3 { margin: 0 0 5px 0; color: #333; }
+        .job-info p { margin: 5px 0; color: #666; }
+        
+        .btn { padding: 10px 15px; text-decoration: none; border-radius: 5px; color: white; font-weight: bold; }
+        .btn-view { background-color: #17a2b8; }
+        .btn-apply { background-color: #28a745; margin-left: 10px; }
+    </style>
+</head>
+<body>
+    <div style="margin-bottom: 20px; background: white; padding: 15px; border-radius: 8px;">
+        <form method="GET" style="display: flex; gap: 10px;">
+            <input type="text" name="q" placeholder="🔍 Tìm theo tên công việc, địa điểm..." 
+                value="{{ request.GET.q }}" 
+                style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+            <button type="submit" class="btn btn-view" style="margin-top:0;">Tìm kiếm</button>
+            {% if request.GET.q %}
+                <a href="{% url 'candidate_dashboard' %}" class="btn" style="background: gray; color: white; margin-top:0; line-height: 20px;">Xóa lọc</a>
+            {% endif %}
+        </form>
+    </div>
+    <div class="navbar">
+        <div>
+            <a href="{% url 'my_applications' %}">📂 Lịch Sử Ứng Tuyển</a>
+            <a href="{% url 'my_profile' %}">👤 Hồ Sơ Cá Nhân</a>
+        </div>
+        <div style="color: white;">
+            Xin chào, {{ request.user.email }} | <a href="{% url 'home' %}" style="display:inline; padding:0; background:none;">Thoát</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🔥 Việc làm đang tuyển dụng</h2>
+        
+        {% for job in jobs %}
+        <div class="job-card">
+            <div class="job-info">
+                <h3>{{ job.title }}</h3>
+                <p>🏢 {{ job.company_name }}</p>
+                <p>📍 {{ job.location }} | 💰 {{ job.salary_range }}</p>
+                <small>Hạn nộp: {{ job.deadline|date:"d/m/Y" }}</small>
+            </div>
+            
+            <div class="job-actions">
+                <a href="{% url 'job_detail' job.id %}" class="btn btn-view">Xem chi tiết</a>
+                
+                <a href="{% url 'job_detail' job.id %}" class="btn btn-apply">Ứng tuyển</a>
+            </div>
+        </div>
+        {% empty %}
+            <p>Hiện chưa có bài đăng nào.</p>
+        {% endfor %}
+    </div>
+
+</body>
+</html>
