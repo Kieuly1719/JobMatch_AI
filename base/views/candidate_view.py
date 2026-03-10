@@ -80,10 +80,10 @@ def apply_job(request, pk):
         candidate=request.user,
         status='Pending' 
     )
-    Notification.objects.create(
-        user = job.recruiter,
-        message = f"Hồ sơ mới từ {request.user.candidate_profile.full_name} cho job {job.title}",
-        link=f"/job/{job.id}/applicants/"
-    )
+    # Notification.objects.create(
+    #     user = job.recruiter,
+    #     message = f"Hồ sơ mới từ {request.user.candidate_profile.full_name} cho job {job.title}",
+    #     link=f"/job/{job.id}/applicants/"
+    # )
     messages.success(request, 'Nộp đơn ứng tuyển thành công! Chúc bạn may mắn.')
     return redirect('candidate_dashboard')

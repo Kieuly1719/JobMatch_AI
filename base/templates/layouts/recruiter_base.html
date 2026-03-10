@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi" class="light">
+  <head>
+    <meta charset="UTF-8" />
+    <title>
+      {% block title %}
+        Recruiter Dashboard
+      {% endblock %}
+    </title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              primary: '#ee862b',
+              'background-light': '#fcfaf8',
+              'background-dark': '#221810'
+            },
+            fontFamily: {
+              display: ['Inter', 'sans-serif']
+            }
+          }
+        }
+      }
+    </script>
+  </head>
+{% include "components/toast.html" %}
+  <body class="bg-background-light font-display text-slate-900 min-h-screen">
+    <div class="flex h-screen overflow-hidden">
+      <!-- SIDEBAR -->
+      <aside class="w-64 border-r border-primary/10 bg-white flex flex-col">
+        <div class="p-6 flex items-center gap-3">
+          <div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+            <span class="material-symbols-outlined">smart_toy</span>
+          </div>
+          <h1 class="text-xl font-bold">Job Match AI</h1>
+        </div>
+
+        <nav class="flex-1 px-4 space-y-2 py-4">
+          <a href="{% url 'recruiter_dashboard' %}"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl
+       {% if active == 'dashboard' %}
+              
+            bg-primary/10 text-primary font-semibold
+
+            {% else %}
+              
+            hover:bg-primary/5 text-slate-600
+
+            {% endif %}">
+            <span class="material-symbols-outlined">dashboard</span>
+            <span>Tổng quan</span>
+          </a>
+
+          <a href="{% url 'create_job' %}"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl
+       {% if active == 'jobs' %}
+              
+            bg-primary/10 text-primary font-semibold
+
+            {% else %}
+              
+            hover:bg-primary/5 text-slate-600
+
+            {% endif %}">
+            <span class="material-symbols-outlined">work</span>
+            <span>Tin tuyển dụng</span>
+          </a>
+        </nav>
+
+        <div class="p-4 mt-auto">
+          <a href="{% url 'logout' %}" class="w-full block text-center py-2 bg-slate-200 hover:bg-slate-300 rounded-lg text-sm font-semibold">Đăng xuất</a>
+        </div>
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <main class="flex-1 flex flex-col overflow-y-auto">
+        <!-- HEADER -->
+        <header class="h-16 border-b border-primary/10 bg-white flex items-center justify-between px-8">
+          <h2 class="text-lg font-bold">{{ request.user.email }}</h2>
+        </header>
+
+        <!-- PAGE CONTENT -->
+        <div class="p-8">
+          {% block content %}
+          {% endblock %}
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

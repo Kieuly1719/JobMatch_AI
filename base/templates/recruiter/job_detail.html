@@ -1,64 +1,172 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ job.title }} - Chi tiết</title>
-    <style>
-        body { font-family: sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; }
-        .header { border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
-        .company-name { color: #555; font-size: 1.2em; }
-        .meta-info { color: #777; margin-top: 10px; }
-        .section { margin-bottom: 20px; }
-        .section h3 { border-left: 4px solid #007bff; padding-left: 10px; }
-        
-        .btn-apply { display: inline-block; background-color: #28a745; color: white; padding: 15px 30px; text-decoration: none; font-size: 18px; border-radius: 5px; font-weight: bold; }
-        .btn-edit { background-color: #ffc107; color: black; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-right: 10px;}
-        .btn-delete { background-color: #dc3545; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
-    </style>
-</head>
-<body>
+{% extends 'base.html' %}
+{% block content %}
 
-    <a href="{% url 'home' %}">← Về trang chủ</a>
+<main class="flex-1 max-w-7xl mx-auto w-full px-6 md:px-20 py-8">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-    <div class="header">
-        <h1>{{ job.title }}</h1>
-        <p class="company-name">{{ job.company_name }}</p>
-        
-        <div class="meta-info">
-            <span>Địa điểm: {{ job.location }}</span> | 
-            <span>Lương: {{ job.salary_range }}</span> | 
-            <span>Hạn nộp: {{ job.deadline|date:"d/m/Y" }}</span>
-        </div>
-    </div>
+    <!-- LEFT SIDE -->
+    <div class="lg:col-span-2 space-y-6">
 
-    <div style="margin-bottom: 30px;">
-        {% if request.user == job.recruiter %}
-            <p>You are the owner of this post.</p>
-            <a href="{% url 'update_job' job.id %}" class="btn-edit">✏️ Sửa bài</a>
-            <a href="{% url 'delete_job' job.id %}" class="btn-delete">🗑️ Xóa bài</a>
-            <a href="{% url 'job_applicants' job.id %}" class="btn-edit" style="background-color: #17a2b8; color: white;">👥 Xem người ứng tuyển</a>
-        
-        {% elif request.user.role == 'candidate' %}
-            <form action="{% url 'apply_job' job.id %}" method="POST">
+      <!-- HERO -->
+      <div class="bg-white dark:bg-slate-800/40 p-6 md:p-8 rounded-xl border border-primary/10 shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+
+          <div class="space-y-4">
+            <div class="flex items-center gap-3">
+              <div class="size-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary text-3xl">work</span>
+              </div>
+              <div>
+                <h1 class="text-3xl font-black text-slate-900 dark:text-white">
+                  {{ job.title }}
+                </h1>
+                <p class="text-primary font-semibold">
+                  {{ job.company_name }} • {{ job.location }}
+                </p>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-4 text-sm text-slate-600 dark:text-slate-400">
+              <div class="flex items-center gap-1">
+                <span class="material-symbols-outlined text-base">location_on</span>
+                {{ job.location }}
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="material-symbols-outlined text-base">payments</span>
+                {{ job.salary_range }}
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="material-symbols-outlined text-base">calendar_today</span>
+                Deadline: {{ job.deadline|date:"d/m/Y" }}
+              </div>
+            </div>
+          </div>
+
+          <!-- ACTION BUTTONS -->
+          <div class="flex flex-row md:flex-col gap-3">
+            {% if request.user == job.recruiter %}
+              <a href="{% url 'update_job' job.id %}"
+                 class="flex-1 md:w-40 h-12 rounded-lg bg-yellow-400 text-black font-bold hover:brightness-110 flex items-center justify-center">
+                ✏️ Edit
+              </a>
+              <a href="{% url 'delete_job' job.id %}"
+                 class="flex-1 md:w-40 h-12 rounded-lg bg-red-500 text-white font-bold hover:brightness-110 flex items-center justify-center">
+                🗑️ Delete
+              </a>
+              <a href="{% url 'job_applicants' job.id %}"
+                 class="flex-1 md:w-40 h-12 rounded-lg bg-blue-500 text-white font-bold hover:brightness-110 flex items-center justify-center">
+                👥 Applicants
+              </a>
+
+            {% elif request.user.role == 'candidate' %}
+              <form action="{% url 'apply_job' job.id %}" method="POST">
                 {% csrf_token %}
-                <button type="submit" class="btn-apply" onclick="return confirm('Bạn có chắc muốn nộp hồ sơ vào vị trí này?')">
-                    🚀 Ứng tuyển ngay
+                <button type="submit"
+                        class="flex-1 md:w-40 h-12 rounded-lg bg-primary text-slate-900 font-bold hover:brightness-110 transition-all"
+                        >
+                  Apply Now
                 </button>
-            </form>
-        {% else %}
-            <a href="{% url 'login' %}" class="btn-apply">Đăng nhập để ứng tuyển</a>
-        {% endif %}
+              </form>
+
+            {% else %}
+              <a href="{% url 'login' %}"
+                 class="flex-1 md:w-40 h-12 rounded-lg bg-primary text-slate-900 font-bold hover:brightness-110 flex items-center justify-center">
+                Login to Apply
+              </a>
+            {% endif %}
+          </div>
+
+        </div>
+      </div>
+
+      <!-- DESCRIPTION -->
+      <div class="bg-white dark:bg-slate-800/40 p-6 md:p-8 rounded-xl border border-primary/10">
+        <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary">description</span>
+          Job Description
+        </h2>
+        <div class="space-y-4 text-slate-700 dark:text-slate-300 leading-relaxed">
+          {{ job.description|linebreaks }}
+        </div>
+
+        <h2 class="text-xl font-bold mt-8 mb-4 flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary">fact_check</span>
+          Requirements
+        </h2>
+        <div class="text-slate-700 dark:text-slate-300 leading-relaxed">
+          {{ job.requirements|linebreaks }}
+        </div>
+      </div>
     </div>
 
-    <div class="section">
-        <h3>Mô tả công việc</h3>
-        <p>{{ job.description|linebreaks }}</p>
-    </div>
+    <!-- RIGHT SIDEBAR -->
+    <div class="space-y-6">
 
-    <div class="section">
-        <h3>Yêu cầu ứng viên</h3>
-        <p>{{ job.requirements|linebreaks }}</p>
-    </div>
+      <!-- COMPANY INFO -->
+      <div class="bg-white dark:bg-slate-800/40 p-6 rounded-xl border border-primary/10">
+        <h3 class="font-bold text-lg mb-4">About the Company</h3>
+        <div class="flex items-center gap-3 mb-4">
+          <div class="size-14 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center overflow-hidden">
+            <span class="material-symbols-outlined text-3xl text-slate-400">business</span>
+          </div>
+          <div>
+            <h4 class="font-bold text-slate-900 dark:text-white">
+              {{ job.company_name }}
+            </h4>
+            <p class="text-sm text-slate-500">
+              Technology
+            </p>
+          </div>
+        </div>
 
-</body>
-</html>
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between">
+            <span class="text-slate-500">Industry</span>
+            <span class="font-medium">Technology</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500">Company size</span>
+            <span class="font-medium">50-200</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500">Location</span>
+            <span class="font-medium">{{ job.location }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIMILAR JOBS (optional) -->
+      <div class="space-y-4">
+        <h3 class="font-bold text-lg px-2">Similar Jobs</h3>
+
+        {% for j in similar_jobs %}
+        <a href="{% url 'job_detail' j.id %}"
+           class="block bg-white dark:bg-slate-800/40 p-4 rounded-xl border border-primary/5 hover:border-primary/30 transition-all cursor-pointer group">
+          <p class="text-primary text-xs font-bold uppercase tracking-wider mb-1">
+            {{ j.job_type }}
+          </p>
+          <h4 class="font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">
+            {{ j.title }}
+          </h4>
+          <p class="text-sm text-slate-500">
+            {{ j.company_name }} • {{ j.location }}
+          </p>
+          <div class="mt-3 flex items-center justify-between">
+            <span class="text-xs text-slate-400">
+              {{ j.created_at|timesince }} ago
+            </span>
+            <span class="material-symbols-outlined text-slate-400 group-hover:translate-x-1 transition-transform">
+              arrow_forward
+            </span>
+          </div>
+        </a>
+        {% empty %}
+        <p class="text-sm text-slate-500 px-2">No similar jobs found.</p>
+        {% endfor %}
+      </div>
+
+    </div>
+  </div>
+</main>
+
+{% endblock %}

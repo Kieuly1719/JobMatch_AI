@@ -1,100 +1,67 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>Dashboard Nhà Tuyển Dụng</title>
-    <style>
-        body { font-family: sans-serif; padding: 20px; }
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
-        .btn { padding: 10px 15px; text-decoration: none; color: white; border-radius: 5px; }
-        .btn-green { background-color: #28a745; }
-        .btn-blue { background-color: #007bff; }
-        .btn-red { background-color: #dc3545; }
-        .btn-logout { background-color: #6c757d; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-    </style>
-</head>
-<body>
+{% extends "layouts/recruiter_base.html" %}
 
-    <div class="header">
-        <div>
-            <h2>Xin chào, {{ request.user.email }}</h2>
-            <p>Vai trò: Nhà tuyển dụng</p>
-        </div>
-        <a href="{% url 'home' %}" class="btn btn-logout">Đăng xuất (Tạm về Home)</a>
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<h2 class="text-3xl font-bold mb-8">
+    Xin chào, {{ request.user.email }} 👋
+</h2>
+
+<div class="grid md:grid-cols-3 gap-6 mb-10">
+
+    <div class="bg-white p-6 rounded-2xl shadow border">
+        <p class="text-sm text-slate-500">Tin đang tuyển</p>
+        <h3 class="text-3xl font-bold mt-2">{{ my_jobs.count }}</h3>
     </div>
 
-    <div style="margin-top: 20px; padding: 15px; background-color: #f9f9f9; border-radius: 5px;">
-        <h3>🏢 Thông tin Công ty</h3>
-        {% if company %}
-            <p><strong>Tên công ty:</strong> {{ company.name }}</p>
-            <p><strong>Website:</strong> <a href="{{ company.website }}" target="_blank">{{ company.website }}</a></p>
-            <p><strong>Địa chỉ:</strong> {{ company.address }}</p>
-            <a href="#" class="btn btn-blue">Chỉnh sửa hồ sơ công ty</a>
-        {% else %}
-            <p style="color: red;">Bạn chưa cập nhật hồ sơ công ty!</p>
-            <a href="#" class="btn btn-blue">Tạo hồ sơ công ty ngay</a>
-        {% endif %}
-    </div>
-    <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-    <h3>🔔 Thông báo mới ({% if notifications %}{{ notifications.count }}{% else %}0{% endif %})</h3>
-        
-        {% if notifications %}
-            <ul style="list-style: none; padding: 0;">
-                {% for notif in notifications %}
-                <li style="padding: 10px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
-                    <span>{{ notif.message }} <small style="color:gray">({{ notif.created_at|timesince }} trước)</small></span>
-                    
-                    <a href="{% url 'mark_notif_read' notif.id %}" class="btn btn-blue" style="font-size: 12px; padding: 5px 10px;">Xem ngay</a>
-                </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p style="color: gray;">Bạn không có thông báo mới nào.</p>
-        {% endif %}
+    <div class="bg-white p-6 rounded-2xl shadow border">
+        <p class="text-sm text-slate-500">Ứng viên mới</p>
+        <h3 class="text-3xl font-bold mt-2">{{ total_applications }}</h3>
     </div>
 
-    <div style="margin-top: 30px;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h3>📋 Danh sách tin đã đăng ({{ jobs.count }})</h3>
-            <a href="{% url 'create_job' %}" class="btn btn-green">+ Đăng tin mới</a>
-        </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Tiêu đề công việc</th>
-                    <th>Thời hạn</th>
-                    <th>Địa điểm</th>
-                    <th>Hành động</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for job in my_jobs %}
-                <tr>
-                    <td>
-                        <strong>{{ job.title }}</strong><br>
-                        <small>Lương: {{ job.salary_range }}</small>
-                    </td>
-                    <td>{{ job.deadline|date:"d/m/Y" }}</td>
-                    <td>{{ job.location }}</td>
-                    <td>
-                        <a href="{% url 'job_detail' job.id %}" class="btn btn-blue" style="background-color: #17a2b8;">Xem</a>
-                        <a href="{% url 'update_job' job.id %}" class="btn btn-blue">Sửa</a>
-                        <a href="{% url 'delete_job' job.id %}" class="btn btn-red">Xóa</a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="4" style="text-align: center;">Bạn chưa đăng tin tuyển dụng nào.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="bg-white p-6 rounded-2xl shadow border">
+        <p class="text-sm text-slate-500">Thông báo</p>
+        <h3 class="text-3xl font-bold mt-2">{{ notifications.count }}</h3>
     </div>
 
-</body>
-</html>
+</div>
+
+<div class="bg-white rounded-2xl shadow border overflow-hidden">
+    <div class="p-6 border-b">
+        <h3 class="text-xl font-bold">Tin tuyển dụng gần đây</h3>
+    </div>
+
+    <table class="w-full">
+        <thead class="bg-slate-50 text-xs uppercase text-slate-500">
+            <tr>
+                <th class="px-6 py-4">Tiêu đề</th>
+                <th class="px-6 py-4">Hạn</th>
+                <th class="px-6 py-4">Địa điểm</th>
+                <th class="px-6 py-4 text-right">Hành động</th>
+            </tr>
+        </thead>
+
+        <tbody class="divide-y">
+            {% for job in my_jobs %}
+            <tr>
+                <td class="px-6 py-4 font-semibold">{{ job.title }}</td>
+                <td class="px-6 py-4">{{ job.deadline|date:"d/m/Y" }}</td>
+                <td class="px-6 py-4">{{ job.location }}</td>
+                <td class="px-6 py-4 text-right space-x-2">
+                    <a href="{% url 'update_job' job.id %}" class="text-primary">Sửa</a>
+                    <a href="{% url 'delete_job' job.id %}" class="text-red-500">Xóa</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center py-8 text-slate-400">
+                    Bạn chưa đăng tin nào.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

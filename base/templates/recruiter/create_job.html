@@ -1,39 +1,41 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>Đăng Tin Tuyển Dụng</title>
-    <style>
-        body { font-family: sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input, textarea, select { width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box; }
-        button { background-color: #28a745; color: white; padding: 10px 20px; border: none; cursor: pointer; font-size: 16px; border-radius: 5px; }
-        button:hover { background-color: #218838; }
-        .alert { padding: 10px; margin-bottom: 15px; border-radius: 5px; }
-        .alert-error { background-color: #f8d7da; color: #721c24; }
-        .back-link { display: inline-block; margin-bottom: 20px; text-decoration: none; color: #007bff; }
-    </style>
-</head>
-<body>
+{% extends "layouts/recruiter_base.html" %}
+{% block title %}Đăng tin mới{% endblock %}
 
-    <a href="{% url 'recruiter_dashboard' %}" class="back-link">← Quay lại Dashboard</a>
+{% block content %}
 
-    <h2>📝 Đăng Tin Tuyển Dụng Mới</h2>
+<h1 class="text-3xl font-bold mb-8">
+    Đăng Tin Tuyển Dụng Mới
+</h1>
 
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-error">{{ message }}</div>
-        {% endfor %}
-    {% endif %}
+<form method="POST" class="space-y-6 max-w-3xl bg-white p-8 rounded-2xl shadow border">
+    {% csrf_token %}
 
-    <form method="POST">
-        {% csrf_token %}
-        
-        {{ form.as_p }}
+    <div>
+        <label class="block text-sm font-semibold mb-2">Tên công ty</label>
+        {{ form.company_name }}
+    </div>
 
-        <button type="submit">Đăng Tin Ngay</button>
-    </form>
+    <div>
+        <label class="block text-sm font-semibold mb-2">Tiêu đề công việc</label>
+        {{ form.title }}
+    </div>
 
-</body>
-</html>
+    <div>
+        <label class="block text-sm font-semibold mb-2">Địa điểm</label>
+        {{ form.location }}
+    </div>
+
+    <div>
+        <label class="block text-sm font-semibold mb-2">Mô tả</label>
+        {{ form.description }}
+    </div>
+
+    <div class="flex justify-end">
+        <button type="submit"
+            class="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-xl font-bold shadow">
+            Đăng tin
+        </button>
+    </div>
+</form>
+
+{% endblock %}

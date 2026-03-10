@@ -19,9 +19,11 @@ def recruiter_dashboard(request):
     context = {
         'company': company,
         'my_jobs': my_jobs,
-        'notifications': notifications
+        'notifications': notifications,
+        "active": "dashboard"
     }
-    return render(request, 'recruiter/recruiter_dashboard.html', context)
+    return render(request, 'recruiter/recruiter_dashboard.html',
+                  context)
 
 @login_required(login_url='login')
 def create_job(request):
@@ -34,11 +36,12 @@ def create_job(request):
             job = form.save(commit=False)
             job.recruiter = request.user
             job.save()
+            status = "SUCCESS"
             messages.success(request, 'Đăng tin tuyển dụng thành công!')
             return redirect('recruiter_dashboard') 
         else:
-            print(form.errors)
-            messages.error(request, 'Có lỗi xảy ra, vui lòng kiểm tra lại.')
+            status = "ERROR"
+            return render(request, 'recruiter/create_job.html', {'form': form, 'status': status})
     else:
         form = JobPostForm()
     return render(request, 'recruiter/create_job.html', {'form': form})

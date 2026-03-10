@@ -1,23 +1,87 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Đăng ký Test</title>
-</head>
-<body>
-    <h2>Đăng ký tài khoản (Backend Test)</h2>
+{% extends "base.html" %}
+{% block title %}Đăng ký{% endblock %}
 
+{% block content %}
+
+<div class="flex min-h-screen items-center justify-center bg-background-light dark:bg-background-dark px-6 py-12">
+
+  <div class="w-full max-w-md bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800">
+
+    <div class="mb-8 text-center">
+      <h2 class="text-3xl font-extrabold mb-2">Tham gia Job Match AI</h2>
+      <p class="text-slate-500">Tạo tài khoản để bắt đầu</p>
+    </div>
+
+    <!-- Messages -->
     {% if messages %}
-        {% for message in messages %}
-            <p style="color: green;">{{ message }}</p>
-        {% endfor %}
+      {% for message in messages %}
+        <div class="mb-4 px-4 py-3 rounded-lg bg-emerald-100 text-emerald-700 font-semibold">
+          {{ message }}
+        </div>
+      {% endfor %}
     {% endif %}
 
-    <form method="POST">
-        {% csrf_token %}
+    <form method="POST" class="space-y-5">
+      {% csrf_token %}
 
-        {{ form.as_p }}
+      <!-- Email -->
+      <div>
+        <label class="block text-sm font-semibold mb-1.5">
+          Email
+        </label>
+        {{ form.email }}
+        {% if form.email.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ form.email.errors.0 }}</p>
+        {% endif %}
+      </div>
 
-        <button type="submit">Đăng ký ngay</button>
+      <!-- Password -->
+      <div>
+        <label class="block text-sm font-semibold mb-1.5">
+          Mật khẩu
+        </label>
+        {{ form.password1 }}
+        {% if form.password1.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ form.password1.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <!-- Confirm Password -->
+      <div>
+        <label class="block text-sm font-semibold mb-1.5">
+          Xác nhận mật khẩu
+        </label>
+        {{ form.password2 }}
+        {% if form.password2.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ form.password2.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <!-- Role -->
+      <div>
+        <label class="block text-sm font-semibold mb-1.5">
+          Bạn là:
+        </label>
+        {{ form.role }}
+      </div>
+
+      <!-- Submit -->
+      <button type="submit"
+        class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3.5 rounded-xl shadow-lg transition-all">
+        Đăng ký ngay
+      </button>
+
     </form>
-</body>
-</html>
+
+    <p class="mt-8 text-center text-slate-500">
+      Đã có tài khoản?
+      <a href="{% url 'login' %}" class="text-primary font-bold hover:underline">
+        Đăng nhập
+      </a>
+    </p>
+
+  </div>
+
+</div>
+
+{% endblock %}
