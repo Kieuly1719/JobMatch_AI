@@ -8,6 +8,7 @@
       {% block title %}
         Job Match AI
       {% endblock %}
+
     </title>
 
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -78,6 +79,11 @@
     {% block content %}
 
     {% endblock %}
+     {% include "components/ai_chatbox.html" %}
+   {% if request.session.toast %}
+    {% include "components/toast.html" with toast=request.session.toast %}
+{% endif %}
+     {% include "components/toast.html" %}
 
     <!-- FOOTER -->
     <footer class="border-t border-primary/10 py-12 mt-20">

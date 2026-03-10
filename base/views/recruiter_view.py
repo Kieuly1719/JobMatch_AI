@@ -8,6 +8,7 @@ import mimetypes
 
 @login_required(login_url='login')
 def recruiter_dashboard(request):
+    toast = request.session.pop("toast", None)
     if request.user.role != 'recruiter':
         return redirect('login')
     try:
@@ -20,7 +21,8 @@ def recruiter_dashboard(request):
         'company': company,
         'my_jobs': my_jobs,
         'notifications': notifications,
-        "active": "dashboard"
+        "active": "dashboard",
+        "toast": toast
     }
     return render(request, 'recruiter/recruiter_dashboard.html',
                   context)
@@ -36,8 +38,10 @@ def create_job(request):
             job = form.save(commit=False)
             job.recruiter = request.user
             job.save()
-            status = "SUCCESS"
-            messages.success(request, 'Đăng tin tuyển dụng thành công!')
+            request.session["toast"] = {
+                "type": "success",
+                "message": "Đăng tin tuyển dụng thành công!"    
+            }
             return redirect('recruiter_dashboard') 
         else:
             status = "ERROR"
@@ -59,7 +63,10 @@ def update_job(request, pk):
         form = JobPostForm(request.POST, instance=job)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Cập nhật công việc thành công!')
+            request.session["toast"] = {
+                "type": "success",
+                "message": "Cập nhật tin tuyển dụng thành công!"
+            }
             return redirect('recruiter_dashboard')
             
     return render(request, 'recruiter/create_job.html', {'form': form, 'title': 'Cập nhật tin tuyển dụng'})
@@ -73,7 +80,10 @@ def delete_job(request, pk):
 
     if request.method == 'POST':
         job.delete()
-        messages.success(request, 'Xóa công việc thành công!')
+        request.session["toast"] = {
+            "type": "success",
+            "message": "Xóa công việc thành công!"
+        }
         return redirect('recruiter_dashboard')
 
     return render(request, 'recruiter/delete_confirm.html', {'object': job, 'type': 'công việc'})
@@ -103,7 +113,10 @@ def update_application_status(request, pk, status):
     if status in ['Accepted', 'Rejected']:
         application.status = status
         application.save()
-        messages.success(request, f"Đã cập nhật trạng thái ứng viên thành: {status}")
+        request.session["toast"] = {
+            "type": "success",
+            "message": f"Đã cập nhật trạng thái ứng viên thành: {status}"
+        }
 
     return redirect('job_applicants', pk=application.job.id)
 

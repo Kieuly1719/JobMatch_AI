@@ -7,6 +7,9 @@ from django.db.models import Q
 
 @login_required(login_url='login')
 def candidate_dashboard(request):
+    toast = request.session.pop("toast", None)
+    
+
     if request.user.role != 'candidate':
         return redirect('recruiter_dashboard')
     my_applications = Application.objects.filter(candidate=request.user).order_by('-applied_at')
@@ -18,7 +21,8 @@ def candidate_dashboard(request):
             Q(location__icontains = query)
         )
     context = {
-        'jobs': jobs
+        'jobs': jobs,
+        "toast": toast
     }
     return render(request, 'candidate/dashboard.html', context)
 
@@ -63,27 +67,34 @@ def apply_job(request, pk):
     try:
         profile = request.user.candidate_profile
         if not profile.cv_file:
+            request.session["toast"] = {
+                "type": "warning",
+                "message": "Bạn cần upload CV trước khi ứng tuyển!"
+            }
             messages.warning(request, 'Bạn cần upload CV trước khi ứng tuyển!')
             return redirect('my_profile')
         
     except CandidateProfile.DoesNotExist:
-        messages.warning(request, 'Vui lòng cập nhật hồ sơ cá nhân trước!')
+        request.session["toast"] = {
+            "type": "warning",
+            "message": "Bạn cần tạo hồ sơ ứng viên trước khi ứng tuyển!"
+        }
         return redirect('my_profile')
     
     existing_application = Application.objects.filter(job = job, candidate = request.user).exists()
     if existing_application:
-        messages.info(request, 'Bạn đã nộp đơn vào vị trí này rồi.')
+        request.session["toast"] = {
+            "type": "error",
+            "message": "Bạn đã ứng tuyển vào công việc này rồi!"
+        }
         return redirect('job_detail', pk=pk)
-    
     Application.objects.create(
         job=job,
         candidate=request.user,
         status='Pending' 
     )
-    # Notification.objects.create(
-    #     user = job.recruiter,
-    #     message = f"Hồ sơ mới từ {request.user.candidate_profile.full_name} cho job {job.title}",
-    #     link=f"/job/{job.id}/applicants/"
-    # )
-    messages.success(request, 'Nộp đơn ứng tuyển thành công! Chúc bạn may mắn.')
+    request.session["toast"] = {
+    "type": "success",
+    "message": "Nộp đơn ứng tuyển thành công! Chúc bạn may mắn."
+}
     return redirect('candidate_dashboard')

@@ -65,13 +65,6 @@
               <h2 class="text-3xl font-bold mb-2">Đăng nhập</h2>
               <p class="text-slate-500">Chào mừng bạn quay trở lại với Job Match AI</p>
             </div>
-
-            {% if messages %}
-              {% for message in messages %}
-                <div class="mb-4 p-3 bg-red-100 text-red-600 rounded-lg text-sm">{{ message }}</div>
-              {% endfor %}
-            {% endif %}
-
             <form method="POST" action="{% url 'login' %}" class="space-y-6">
               {% csrf_token %}
 
