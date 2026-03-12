@@ -4,21 +4,39 @@ from django.contrib.auth.decorators import login_required
 from base.models import JobPost, Application, CandidateProfile, Notification
 from base.forms import CandidateProfileForm
 from django.db.models import Q
+import os
+from base.recommendation import get_job_recommendations
 
 @login_required(login_url='login')
 def candidate_dashboard(request):
     if request.user.role != 'candidate':
         return redirect('recruiter_dashboard')
     my_applications = Application.objects.filter(candidate=request.user).order_by('-applied_at')
-    jobs = JobPost.objects.all().order_by('-created_at')
+    jobs = JobPost.objects.filter(recruiter__isnull=False).order_by('-created_at')
     query = request.GET.get('q')
     if query:
         jobs = jobs.filter(
             Q(title__icontains = query)|
             Q(location__icontains = query)
         )
+    recommended_jobs = []
+    if not query:
+        try:
+            profile = request.user.candidate_profile
+            if profile.cv_file:
+                cv_path = profile.cv_file.path
+                # Kiểm tra file có tồn tại thật không
+                if os.path.exists(cv_path):
+                    # GỌI HÀM AI CỦA BẠN TẠI ĐÂY
+                    # Lấy Top 5 việc làm phù hợp nhất
+                    recommended_jobs = get_job_recommendations(cv_path, top_n=5)
+        except Exception as e:
+            print(f"⚠️ Lỗi phần gợi ý: {e}")
+    
     context = {
-        'jobs': jobs
+        'jobs': jobs,                   
+        'recommended_jobs': recommended_jobs, # Danh sách AI gợi ý
+        'query': query
     }
     return render(request, 'candidate/dashboard.html', context)
 

@@ -67,6 +67,54 @@
             <p>Hiện chưa có bài đăng nào.</p>
         {% endfor %}
     </div>
+    {% if recommended_jobs and not request.GET.q %}
+    <div class="recommend-section" style="background: #e3f2fd; padding: 20px; border-radius: 8px; margin-bottom: 30px; border: 1px solid #90caf9;">
+        <h2 style="color: #1565c0; margin-top: 0;">✨ Việc làm phù hợp nhất với hồ sơ của bạn</h2>
+        <p><small>Dựa trên phân tích kỹ năng trong CV: <b>{{ request.user.candidate_profile.cv_file.name }}</b></small></p>
 
+        <div class="job-list">
+            {% for job in recommended_jobs %}
+            <div class="job-card" style="background: white; padding: 15px; margin-bottom: 10px; border-left: 5px solid #ff9800; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <div style="display: flex; justify-content: space-between;">
+                    <div>
+                        <h3 style="margin: 0 0 5px 0;">
+                            <a href="{% url 'job_detail' job.id %}" style="text-decoration: none; color: #333;">{{ job.title }}</a>
+                        </h3>
+                        <span style="color: #666;">🏢 {{ job.company_name }}</span> | 
+                        <span style="color: #666;">📍 {{ job.location }}</span>
+                    </div>
+                    <div>
+                        <a href="{% url 'job_detail' job.id %}" class="btn" style="background: #ff9800;">Xem ngay</a>
+                    </div>
+                </div>
+                <div style="margin-top: 10px; font-size: 0.9em; color: green;">
+                    🎯 Độ phù hợp cao (AI Matching)
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+
+    <h2 style="border-bottom: 2px solid #eee; padding-bottom: 10px;">
+        {% if request.GET.q %}
+            Kết quả tìm kiếm cho: "{{ request.GET.q }}"
+        {% else %}
+            Việc làm mới nhất
+        {% endif %}
+    </h2>
+
+    <div class="job-list-all">
+        {% for job in jobs %}
+            <div class="job-card" style="margin-bottom: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 5px;">
+                <h3>{{ job.title }}</h3>
+                <p>{{ job.company_name }} - {{ job.location }}</p>
+                <a href="{% url 'job_detail' job.id %}">Chi tiết</a>
+            </div>
+        {% empty %}
+            <p>Không tìm thấy việc làm nào.</p>
+        {% endfor %}
+    </div>
 </body>
 </html>
