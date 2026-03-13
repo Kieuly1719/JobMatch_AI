@@ -6,7 +6,7 @@ from base.forms import UserRegisterForm
 from base.models import JobPost
 
 def home(request):
-    jobs = JobPost.objects.all().order_by('-created_at')[:6]
+    jobs = JobPost.objects.all().order_by('-created_at')
 
     return render(request, 'home.html', {
         'jobs': jobs

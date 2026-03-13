@@ -21,4 +21,5 @@ urlpatterns = [
     path('update-application/<int:pk>/<str:status>/', recruiter_view.update_application_status, name='update_application_status'),
     path('application/<int:application_id>/view-cv/', recruiter_view.view_application_cv, name='view_application_cv'),
     path('notif/<int:pk>/read/', recruiter_view.mark_notification_read, name='mark_notif_read'),
+    path('api/ask-ai/', candidate_view.ask_ai, name='ask_ai'),
 ]
