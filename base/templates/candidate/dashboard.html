@@ -4,17 +4,26 @@
 {% block content %}
 
 <section class="px-6 md:px-10 lg:px-20 py-12">
-<div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
 
-    <!-- LEFT SIDE -->
-    <div class="lg:col-span-2 space-y-10">
+        <!-- LEFT SIDE -->
+        <div class="lg:col-span-2 space-y-10">
 
-        <!-- Greeting -->
-        <div>
-            <p class="text-slate-500 mt-2">
-                Hôm nay có {{ jobs_count }} công việc mới phù hợp với bạn.
-            </p>
+            <!-- Greeting -->
+            <div class="mb-8">
+        <div class="bg-white border border-slate-200 rounded-full py-2 px-4 flex items-center shadow-sm w-fit max-w-full overflow-hidden">
+            <div class="relative mr-3 flex-shrink-0">
+                <span class="material-symbols-outlined text-yellow-500 text-2xl">notifications_active</span>
+                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1 rounded-full border-2 border-white">2</span>
+            </div>
+
+            <h1 class="text-base md:text-lg font-medium text-slate-700 whitespace-nowrap overflow-hidden text-ellipsis">
+                <span class="font-bold">Ứng tuyển 1 chạm</span> - Mọi lúc mọi nơi 
+                <span class="ml-2 font-black text-slate-900">Job Match AI: Tìm Việc Nhanh</span>
+            </h1>
+
         </div>
+    </div>
 
         <!-- Recommended Jobs -->
         <div>
