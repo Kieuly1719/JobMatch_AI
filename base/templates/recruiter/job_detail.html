@@ -47,15 +47,15 @@
             {% if request.user == job.recruiter %}
               <a href="{% url 'update_job' job.id %}"
                  class="flex-1 md:w-40 h-12 rounded-lg bg-yellow-400 text-black font-bold hover:brightness-110 flex items-center justify-center">
-                ✏️ Edit
+                Edit
               </a>
               <a href="{% url 'delete_job' job.id %}"
                  class="flex-1 md:w-40 h-12 rounded-lg bg-red-500 text-white font-bold hover:brightness-110 flex items-center justify-center">
-                🗑️ Delete
+                Delete
               </a>
               <a href="{% url 'job_applicants' job.id %}"
                  class="flex-1 md:w-40 h-12 rounded-lg bg-blue-500 text-white font-bold hover:brightness-110 flex items-center justify-center">
-                👥 Applicants
+                Applicants
               </a>
 
             {% elif request.user.role == 'candidate' %}

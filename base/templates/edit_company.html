@@ -1,0 +1,53 @@
+{% extends "layouts/recruiter_base.html" %}
+
+{% block title %}Cập nhật Hồ sơ Công ty{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <a href="{% url 'recruiter_dashboard' %}" class="inline-flex items-center gap-2 text-slate-500 hover:text-primary transition mb-6">
+        <span class="material-symbols-outlined text-sm">arrow_back</span>
+        Quay lại Dashboard
+    </a>
+
+    <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+        <div class="flex items-center gap-3 mb-8 pb-4 border-b border-slate-100">
+            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
+                <span class="material-symbols-outlined text-2xl">domain</span>
+            </div>
+            <div>
+                <h2 class="text-2xl font-bold text-slate-800">Hồ sơ Doanh nghiệp</h2>
+                <p class="text-slate-500 text-sm mt-1">Cập nhật thông tin để ứng viên hiểu rõ hơn về công ty bạn</p>
+            </div>
+        </div>
+
+        <form method="POST" class="space-y-6">
+            {% csrf_token %}
+            
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-2">Tên công ty <span class="text-red-500">*</span></label>
+                {{ form.name }}
+            </div>
+
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-2">Website công ty</label>
+                {{ form.website }}
+            </div>
+
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-2">Địa chỉ trụ sở</label>
+                {{ form.address }}
+            </div>
+
+            <div class="pt-4 flex items-center justify-end gap-3">
+                <a href="{% url 'recruiter_dashboard' %}" class="px-6 py-3 bg-slate-100 text-slate-700 font-medium rounded-xl hover:bg-slate-200 transition">
+                    Hủy bỏ
+                </a>
+                <button type="submit" class="px-8 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition shadow-sm flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">save</span>
+                    Lưu thay đổi
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

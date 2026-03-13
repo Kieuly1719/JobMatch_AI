@@ -120,6 +120,11 @@ def apply_job(request, pk):
         candidate=request.user,
         status='Pending' 
     )
+    Notification.objects.create(
+        user = job.recruiter,
+        message = f"Hồ sơ mới từ {request.user.candidate_profile.full_name} cho job {job.title}",
+        link=f"/job/{job.id}/applicants/"
+    )
     request.session["toast"] = {
     "type": "success",
     "message": "Nộp đơn ứng tuyển thành công! Chúc bạn may mắn."

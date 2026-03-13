@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import User
+from .models import CompanyProfile, User
 from .models import JobPost, CandidateProfile
 
 class UserRegisterForm(UserCreationForm):
@@ -124,4 +124,17 @@ class CandidateProfileForm(forms.ModelForm):
             'cv_file': forms.ClearableFileInput(attrs={
                 'class': 'block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 dark:file:bg-slate-800 dark:file:text-slate-300'
             }),
+        }
+class CompanyForm(forms.ModelForm):
+    class Meta:
+        model = CompanyProfile
+        fields = ['name', 'website', 'address'] 
+        
+        # Nhúng class Tailwind CSS để giao diện mượt mà
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-primary focus:border-primary block p-3 outline-none transition', 'placeholder': 'Nhập tên công ty...'}),
+            
+            'website': forms.URLInput(attrs={'class': 'w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-primary focus:border-primary block p-3 outline-none transition', 'placeholder': 'https://...'}),
+            
+            'address': forms.TextInput(attrs={'class': 'w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-primary focus:border-primary block p-3 outline-none transition', 'placeholder': 'Số nhà, Tên đường, Quận, TP...'}),
         }

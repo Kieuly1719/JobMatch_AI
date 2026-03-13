@@ -1,4 +1,5 @@
 from django.urls import path
+from base import views
 from base.views import auth_view
 from base.views import candidate_view
 from base.views import recruiter_view
@@ -22,4 +23,5 @@ urlpatterns = [
     path('application/<int:application_id>/view-cv/', recruiter_view.view_application_cv, name='view_application_cv'),
     path('notif/<int:pk>/read/', recruiter_view.mark_notification_read, name='mark_notif_read'),
     path('api/ask-ai/', candidate_view.ask_ai, name='ask_ai'),
+    path('company/edit/', recruiter_view.edit_company, name='edit_company'),
 ]

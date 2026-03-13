@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
-from base.models import JobPost, Application, Notification
-from base.forms import JobPostForm
+from base.models import CompanyProfile, JobPost, Application, Notification
+from base.forms import CompanyForm, JobPostForm
 import mimetypes
 
 @login_required(login_url='login')
@@ -57,7 +57,7 @@ def update_job(request, pk):
     if request.user != job.recruiter:
         return HttpResponseForbidden("Bạn không có quyền chỉnh sửa công việc này.")
         
-    form = JobPostForm(instance=job) # Khởi tạo mặc định
+    form = JobPostForm(instance=job) 
     
     if request.method == 'POST':
         form = JobPostForm(request.POST, instance=job)
@@ -156,3 +156,21 @@ def mark_notification_read(request, pk):
         notif.save()
         return redirect(notif.link) if notif.link else redirect('recruiter_dashboard')
     return redirect('recruiter_dashboard')
+
+@login_required
+def edit_company(request):
+    company = CompanyProfile.objects.filter(user = request.user).first()
+    if request.method == 'POST':
+        form = CompanyForm(request.POST, instance=company)
+        
+        if form.is_valid():
+            # Khoan lưu vội, lấy dữ liệu ra trước để gắn user vào (đề phòng trường hợp Tạo mới)
+            new_company = form.save(commit=False)
+            new_company.user = request.user 
+            new_company.save()
+            return redirect('recruiter_dashboard') # Lưu xong thì quay về Dashboard
+    else:
+        # Nếu là request GET (vào xem trang), thì hiển thị form với dữ liệu cũ (nếu có)
+        form = CompanyForm(instance=company)
+
+    return render(request, 'edit_company.html', {'form': form})
