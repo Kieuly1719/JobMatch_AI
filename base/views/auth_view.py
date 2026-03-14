@@ -6,7 +6,14 @@ from base.forms import UserRegisterForm
 from base.models import JobPost
 
 def home(request):
-    jobs = JobPost.objects.all().order_by('-created_at')[:6]
+    jobs = JobPost.objects.all().order_by('-created_at')
+    if request.user.is_authenticated:
+
+        if request.user.role == "recruiter":
+            return redirect("recruiter_dashboard")
+
+        elif request.user.role == "candidate":
+            return redirect("candidate_dashboard")
 
     return render(request, 'home.html', {
         'jobs': jobs

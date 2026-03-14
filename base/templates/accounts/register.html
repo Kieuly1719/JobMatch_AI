@@ -12,14 +12,6 @@
       <p class="text-slate-500">Tạo tài khoản để bắt đầu</p>
     </div>
 
-    <!-- Messages -->
-    {% if messages %}
-      {% for message in messages %}
-        <div class="mb-4 px-4 py-3 rounded-lg bg-emerald-100 text-emerald-700 font-semibold">
-          {{ message }}
-        </div>
-      {% endfor %}
-    {% endif %}
 
     <form method="POST" class="space-y-5">
       {% csrf_token %}

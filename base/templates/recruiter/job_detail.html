@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
 
+
 <main class="flex-1 max-w-7xl mx-auto w-full px-6 md:px-20 py-8">
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-    <!-- LEFT SIDE -->
+    <!-- BÊN TRÁI -->
     <div class="lg:col-span-2 space-y-6">
 
       <!-- HERO -->
@@ -37,41 +38,40 @@
               </div>
               <div class="flex items-center gap-1">
                 <span class="material-symbols-outlined text-base">calendar_today</span>
-                Deadline: {{ job.deadline|date:"d/m/Y" }}
+                Hạn nộp: {{ job.deadline|date:"d/m/Y" }}
               </div>
             </div>
           </div>
 
-          <!-- ACTION BUTTONS -->
+          <!-- NÚT HÀNH ĐỘNG -->
           <div class="flex flex-row md:flex-col gap-3">
             {% if request.user == job.recruiter %}
               <a href="{% url 'update_job' job.id %}"
                  class="flex-1 md:w-40 h-12 rounded-lg bg-yellow-400 text-black font-bold hover:brightness-110 flex items-center justify-center">
-                ✏️ Edit
+                Chỉnh sửa
               </a>
               <a href="{% url 'delete_job' job.id %}"
                  class="flex-1 md:w-40 h-12 rounded-lg bg-red-500 text-white font-bold hover:brightness-110 flex items-center justify-center">
-                🗑️ Delete
+                Xóa
               </a>
               <a href="{% url 'job_applicants' job.id %}"
                  class="flex-1 md:w-40 h-12 rounded-lg bg-blue-500 text-white font-bold hover:brightness-110 flex items-center justify-center">
-                👥 Applicants
+                Ứng viên
               </a>
 
             {% elif request.user.role == 'candidate' %}
               <form action="{% url 'apply_job' job.id %}" method="POST">
                 {% csrf_token %}
                 <button type="submit"
-                        class="flex-1 md:w-40 h-12 rounded-lg bg-primary text-slate-900 font-bold hover:brightness-110 transition-all"
-                        >
-                  Apply Now
+                        class="flex-1 md:w-40 h-12 rounded-lg bg-primary text-slate-900 font-bold hover:brightness-110 transition-all">
+                  Ứng tuyển ngay
                 </button>
               </form>
 
             {% else %}
               <a href="{% url 'login' %}"
                  class="flex-1 md:w-40 h-12 rounded-lg bg-primary text-slate-900 font-bold hover:brightness-110 flex items-center justify-center">
-                Login to Apply
+                Đăng nhập để ứng tuyển
               </a>
             {% endif %}
           </div>
@@ -79,11 +79,11 @@
         </div>
       </div>
 
-      <!-- DESCRIPTION -->
+      <!-- MÔ TẢ CÔNG VIỆC -->
       <div class="bg-white dark:bg-slate-800/40 p-6 md:p-8 rounded-xl border border-primary/10">
         <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
           <span class="material-symbols-outlined text-primary">description</span>
-          Job Description
+          Mô tả công việc
         </h2>
         <div class="space-y-4 text-slate-700 dark:text-slate-300 leading-relaxed">
           {{ job.description|linebreaks }}
@@ -91,7 +91,7 @@
 
         <h2 class="text-xl font-bold mt-8 mb-4 flex items-center gap-2">
           <span class="material-symbols-outlined text-primary">fact_check</span>
-          Requirements
+          Yêu cầu
         </h2>
         <div class="text-slate-700 dark:text-slate-300 leading-relaxed">
           {{ job.requirements|linebreaks }}
@@ -99,12 +99,12 @@
       </div>
     </div>
 
-    <!-- RIGHT SIDEBAR -->
+    <!-- SIDEBAR BÊN PHẢI -->
     <div class="space-y-6">
 
-      <!-- COMPANY INFO -->
+      <!-- THÔNG TIN CÔNG TY -->
       <div class="bg-white dark:bg-slate-800/40 p-6 rounded-xl border border-primary/10">
-        <h3 class="font-bold text-lg mb-4">About the Company</h3>
+        <h3 class="font-bold text-lg mb-4">Về công ty</h3>
         <div class="flex items-center gap-3 mb-4">
           <div class="size-14 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center overflow-hidden">
             <span class="material-symbols-outlined text-3xl text-slate-400">business</span>
@@ -114,30 +114,30 @@
               {{ job.company_name }}
             </h4>
             <p class="text-sm text-slate-500">
-              Technology
+              Công nghệ
             </p>
           </div>
         </div>
 
         <div class="space-y-3 text-sm">
           <div class="flex justify-between">
-            <span class="text-slate-500">Industry</span>
-            <span class="font-medium">Technology</span>
+            <span class="text-slate-500">Lĩnh vực</span>
+            <span class="font-medium">Công nghệ</span>
           </div>
           <div class="flex justify-between">
-            <span class="text-slate-500">Company size</span>
+            <span class="text-slate-500">Quy mô công ty</span>
             <span class="font-medium">50-200</span>
           </div>
           <div class="flex justify-between">
-            <span class="text-slate-500">Location</span>
+            <span class="text-slate-500">Địa điểm</span>
             <span class="font-medium">{{ job.location }}</span>
           </div>
         </div>
       </div>
 
-      <!-- SIMILAR JOBS (optional) -->
+      <!-- VIỆC LÀM TƯƠNG TỰ -->
       <div class="space-y-4">
-        <h3 class="font-bold text-lg px-2">Similar Jobs</h3>
+        <h3 class="font-bold text-lg px-2">Công việc tương tự</h3>
 
         {% for j in similar_jobs %}
         <a href="{% url 'job_detail' j.id %}"
@@ -153,7 +153,7 @@
           </p>
           <div class="mt-3 flex items-center justify-between">
             <span class="text-xs text-slate-400">
-              {{ j.created_at|timesince }} ago
+              {{ j.created_at|timesince }} trước
             </span>
             <span class="material-symbols-outlined text-slate-400 group-hover:translate-x-1 transition-transform">
               arrow_forward
@@ -161,7 +161,7 @@
           </div>
         </a>
         {% empty %}
-        <p class="text-sm text-slate-500 px-2">No similar jobs found.</p>
+        <p class="text-sm text-slate-500 px-2">Không có công việc tương tự.</p>
         {% endfor %}
       </div>
 

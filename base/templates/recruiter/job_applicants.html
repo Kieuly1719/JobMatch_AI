@@ -1,111 +1,108 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>Danh sách ứng viên - {{ job.title }}</title>
-    <style>
-        body { font-family: sans-serif; padding: 20px; background-color: #f4f6f9; }
-        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px; }
-        .btn-back { text-decoration: none; color: #555; font-weight: bold; }
-        
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #007bff; color: white; }
-        tr:hover { background-color: #f1f1f1; }
+{% extends 'layouts/recruiter_base.html' %}
+{% block title %}
+  Danh sách ứng viên
+{% endblock %}
 
-        .btn { padding: 6px 12px; border-radius: 4px; text-decoration: none; color: white; font-size: 14px; margin-right: 5px; display: inline-block; }
-        .btn-cv { background-color: #17a2b8; }
-        .btn-accept { background-color: #28a745; }
-        .btn-reject { background-color: #dc3545; }
-        
-        /* Màu trạng thái */
-        .status-pending { color: #ffc107; font-weight: bold; }
-        .status-accepted { color: #28a745; font-weight: bold; }
-        .status-rejected { color: #dc3545; font-weight: bold; }
-    </style>
-</head>
-<body>
+{% block content %}
+  <div class="flex flex-col max-w-[1200px] mx-auto w-full">
+    <!-- Page Title -->
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+      <div>
+        <h1 class="text-3xl font-black">Danh sách ứng viên</h1>
+        <p class="text-slate-500 mt-1">Quản lý và xét duyệt hồ sơ ứng tuyển</p>
+      </div>
 
-<div class="container">
-    <div class="header">
-        <div>
-            <h2>👥 Ứng viên: {{ job.title }}</h2>
-            <p>Tổng số đơn: <strong>{{ applications.count }}</strong></p>
-        </div>
-        <a href="{% url 'recruiter_dashboard' %}" class="btn-back">← Quay lại Dashboard</a>
+      <a href="{% url 'recruiter_dashboard' %}" class="flex items-center gap-2 rounded-lg h-10 px-4 bg-primary/10 text-primary hover:bg-primary/20 text-sm font-bold">
+        <span class="material-symbols-outlined text-lg">arrow_back</span>
+        Quay lại Dashboard
+      </a>
     </div>
 
-    <table>
-        <thead>
+    <!-- Job Info -->
+    <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
+      <div class="flex items-center gap-4">
+        <div class="size-12 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
+          <span class="material-symbols-outlined text-3xl">work</span>
+        </div>
+
+        <div>
+          <h2 class="text-xl font-bold">Ứng viên: {{ job.title }}</h2>
+          <p class="text-slate-500 text-sm">Tổng đơn ứng tuyển: {{ applications.count }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="overflow-hidden rounded-xl border bg-white shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left">
+          <thead class="bg-slate-50 border-b">
             <tr>
-                <th>Họ tên & Trình độ</th>
-                <th>Liên hệ</th>
-                <th>Ngày nộp</th>
-                <th>CV & Hồ sơ</th>
-                <th>Trạng thái</th>
-                <th>Hành động</th>
+              <th class="px-6 py-4 text-sm font-semibold">Họ tên</th>
+              <th class="px-6 py-4 text-sm font-semibold">Liên hệ</th>
+              <th class="px-6 py-4 text-sm font-semibold">Ngày nộp</th>
+              <th class="px-6 py-4 text-sm font-semibold text-center">CV</th>
+              <th class="px-6 py-4 text-sm font-semibold text-center">Trạng thái</th>
+              <th class="px-6 py-4 text-sm font-semibold text-right">Hành động</th>
             </tr>
-        </thead>
-        <tbody>
+          </thead>
+
+          <tbody class="divide-y">
             {% for app in applications %}
-            <tr>
-                <td>
-                    <strong>{{ app.candidate.candidate_profile.full_name }}</strong><br>
-                    <small style="color: gray;">
-                        {{ app.candidate.candidate_profile.get_gender_display }} - 
-                        {{ app.candidate.candidate_profile.get_level_display }}
-                    </small>
+              <tr class="hover:bg-slate-50 transition">
+                <td class="px-6 py-4">
+                  <div class="flex flex-col">
+                    <span class="font-semibold">{{ app.candidate.candidate_profile.full_name }}</span>
+                    <span class="text-xs text-slate-500">{{ app.candidate.candidate_profile.get_level_display }}</span>
+                  </div>
                 </td>
 
-                <td>
-                    📞 {{ app.candidate.candidate_profile.phone_number }}<br>
-                    📧 {{ app.candidate.email }}<br>
-                    📍 {{ app.candidate.candidate_profile.address }}
+                <td class="px-6 py-4 text-sm text-slate-600">
+                  <div class="flex flex-col gap-1">
+                    <span>📞 {{ app.candidate.candidate_profile.phone_number }}</span>
+                    <span>📧 {{ app.candidate.email }}</span>
+                    <span>📍 {{ app.candidate.candidate_profile.address }}</span>
+                  </div>
                 </td>
 
-                <td>{{ app.applied_at|date:"d/m/Y H:i" }}</td>
+                <td class="px-6 py-4 text-sm">{{ app.applied_at|date:'d/m/Y H:i' }}</td>
 
-                <td>
-                    {% if app.candidate.candidate_profile.cv_file %}
-                        <a href="{% url 'view_application_cv' app.id %}" target="_blank" class="btn btn-cv">
-                            📄 Xem PDF
-                        </a>
-                    {% else %}
-                        <span style="color: red;">Chưa có CV</span>
-                    {% endif %}
+                <td class="px-6 py-4 text-center">
+                  {% if app.candidate.candidate_profile.cv_file %}
+                    <a href="{% url 'view_application_cv' app.id %}" target="_blank" class="inline-flex items-center gap-1 px-3 py-1 rounded-lg border text-xs font-bold hover:bg-slate-100">📄 Xem PDF</a>
+                  {% else %}
+                    <span class="text-red-500 text-sm">Chưa có CV</span>
+                  {% endif %}
                 </td>
 
-                <td>
-                    {% if app.status == 'Pending' %}
-                        <span class="status-pending">⏳ Chờ duyệt</span>
-                    {% elif app.status == 'Accepted' %}
-                        <span class="status-accepted">✅ Đã nhận</span>
-                    {% else %}
-                        <span class="status-rejected">❌ Từ chối</span>
-                    {% endif %}
+                <td class="px-6 py-4 text-center">
+                  {% if app.status == 'Pending' %}
+                    <span class="px-2 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700">Chờ duyệt</span>
+                  {% elif app.status == 'Accepted' %}
+                    <span class="px-2 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">Đã duyệt</span>
+                  {% else %}
+                    <span class="px-2 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700">Từ chối</span>
+                  {% endif %}
                 </td>
 
-                <td>
-                    {% if app.status == 'Pending' %}
-                        <a href="{% url 'update_application_status' app.id 'Accepted' %}" class="btn btn-accept">✓ Duyệt</a>
-                        <a href="{% url 'update_application_status' app.id 'Rejected' %}" class="btn btn-reject" onclick="return confirm('Từ chối ứng viên này?')">✗ Loại</a>
-                    {% else %}
-                        <span style="color: #888;">Đã xử lý</span>
-                    {% endif %}
+                <td class="px-6 py-4 text-right">
+                  {% if app.status == 'Pending' %}
+                    <a href="{% url 'update_application_status' app.id 'Accepted' %}" class="px-3 py-1 bg-green-500 text-white rounded-lg text-xs font-bold hover:bg-green-600">Duyệt</a>
+
+                    <a href="{% url 'update_application_status' app.id 'Rejected' %}" onclick="return confirm('Từ chối ứng viên này?')" class="px-3 py-1 bg-red-500 text-white rounded-lg text-xs font-bold hover:bg-red-600">Loại</a>
+                  {% else %}
+                    <span class="text-slate-400 text-sm">Đã xử lý</span>
+                  {% endif %}
                 </td>
-            </tr>
+              </tr>
             {% empty %}
-            <tr>
-                <td colspan="6" style="text-align: center; padding: 20px;">
-                    Chưa có ứng viên nào nộp đơn cho vị trí này.
-                </td>
-            </tr>
+              <tr>
+                <td colspan="6" class="text-center py-10 text-slate-500">Chưa có ứng viên nào nộp đơn.</td>
+              </tr>
             {% endfor %}
-        </tbody>
-    </table>
-</div>
-
-</body>
-</html>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock %}

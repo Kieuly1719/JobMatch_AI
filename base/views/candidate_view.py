@@ -1,10 +1,37 @@
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from base.models import JobPost, Application, CandidateProfile, Notification
 from base.forms import CandidateProfileForm
 from django.db.models import Q
+import google.generativeai as genai
+import json
+from django.views.decorators.csrf import csrf_exempt
 
+
+genai.configure(api_key="AIzaSyAKXxMG7wBlwz4JD5srpMdfZukIV6GLBw0")
+@csrf_exempt
+def ask_ai(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            user_message = data.get('message', '')
+
+            genai.configure(api_key="AIzaSyAKXxMG7wBlwz4JD5srpMdfZukIV6GLBw0")
+            
+            model = genai.GenerativeModel(model_name="gemini-2.5-flash")
+            
+            prompt = f"Bạn là trợ lý AI chuyên tư vấn việc làm. Trả lời ngắn gọn: {user_message}"
+            response = model.generate_content(prompt)
+            
+            return JsonResponse({'success': True, 'reply': response.text})
+            
+        except Exception as e:
+            error_msg = f"Lỗi từ Google AI: {str(e)}"
+            return JsonResponse({'success': True, 'reply': error_msg})
+            
+    return JsonResponse({'success': False, 'error': 'Lỗi phương thức'})
 @login_required(login_url='login')
 def candidate_dashboard(request):
     toast = request.session.pop("toast", None)
@@ -92,6 +119,11 @@ def apply_job(request, pk):
         job=job,
         candidate=request.user,
         status='Pending' 
+    )
+    Notification.objects.create(
+        user = job.recruiter,
+        message = f"Hồ sơ mới từ {request.user.candidate_profile.full_name} cho job {job.title}",
+        link=f"/job/{job.id}/applicants/"
     )
     request.session["toast"] = {
     "type": "success",

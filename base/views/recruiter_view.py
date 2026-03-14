@@ -2,8 +2,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
-from base.models import JobPost, Application, Notification
-from base.forms import JobPostForm
+from base.models import CompanyProfile, JobPost, Application, Notification
+from base.forms import CompanyForm, JobPostForm
+from django.shortcuts import render
+from django.db.models import Q
+from base.forms import CompanyForm
 import mimetypes
 
 @login_required(login_url='login')
@@ -26,6 +29,117 @@ def recruiter_dashboard(request):
     }
     return render(request, 'recruiter/recruiter_dashboard.html',
                   context)
+@login_required(login_url='login')
+def company_profile(request):
+
+    company = CompanyProfile.objects.get(user=request.user)
+
+    edit_mode = request.GET.get("edit")
+
+    if request.method == "POST":
+
+        form = CompanyForm(
+            request.POST,
+            request.FILES,
+            instance=company
+        )
+
+        if form.is_valid():
+            form.save()
+            return redirect("company_profile")
+
+    else:
+        form = CompanyForm(instance=company)
+
+    return render(
+        request,
+        "recruiter/company_profile.html",
+        {
+            "company": company,
+            "form": form,
+            "edit_mode": edit_mode
+        }
+    )
+@login_required(login_url='login')
+def recruiter_candidates(request):
+
+    applications = Application.objects.filter(
+        job__recruiter=request.user
+    )
+
+    # GET params
+    search = request.GET.get("search")
+    job_filter = request.GET.get("job")
+    status_filter = request.GET.get("status")
+    sort = request.GET.get("sort")
+
+    # SEARCH
+    if search:
+        applications = applications.filter(
+            Q(candidate__candidate_profile__full_name__icontains=search) |
+            Q(candidate__email__icontains=search) |
+            Q(job__title__icontains=search)
+        )
+
+    # FILTER JOB
+    if job_filter:
+        applications = applications.filter(job_id=job_filter)
+
+    # FILTER STATUS
+    if status_filter:
+        applications = applications.filter(status=status_filter)
+
+    # SORT
+    if sort == "oldest":
+        applications = applications.order_by("applied_at")
+    else:
+        applications = applications.order_by("-applied_at")
+
+    jobs = JobPost.objects.filter(recruiter=request.user)
+
+    stats = {
+        "new": applications.filter(status="Pending").count(),
+        "reviewing": applications.filter(status="Pending").count(),
+        "accepted": applications.filter(status="Accepted").count(),
+        "rejected": applications.filter(status="Rejected").count(),
+    }
+
+    return render(
+        request,
+        "recruiter/candidates.html",
+        {
+            "applications": applications,
+            "jobs": jobs,
+            "stats": stats,
+        },
+    )
+@login_required
+def job_management(request):
+
+    status = request.GET.get("status")
+
+    jobs = JobPost.objects.filter(recruiter=request.user)
+
+    if status == "active":
+        jobs = jobs.filter(is_active=True)
+
+    elif status == "expired":
+        jobs = jobs.filter(is_active=False)
+
+    return render(request, "recruiter/job_management.html", {
+        "jobs": jobs,
+        "status": status
+    })
+@login_required(login_url='login')
+def recruiter_job_detail(request, id):
+    job = JobPost.objects.get(id=id)
+    if request.user != job.recruiter:
+        return HttpResponseForbidden("Bạn không có quyền xem chi tiết công việc này.")
+    applications = job.applications.select_related(
+        "candidate",
+        "candidate__candidate_profile"
+    )
+    return render(request, 'recruiter/job_manage_detail.html', {'job': job, 'applications': applications})
 
 @login_required(login_url='login')
 def create_job(request):
@@ -44,7 +158,12 @@ def create_job(request):
             }
             return redirect('recruiter_dashboard') 
         else:
+            print(form.errors)
             status = "ERROR"
+            request.session["toast"] = {
+                "type": "error",
+                "message": "Đăng tin tuyển dụng thất bại!"    
+            }
             return render(request, 'recruiter/create_job.html', {'form': form, 'status': status})
     else:
         form = JobPostForm()
@@ -57,7 +176,7 @@ def update_job(request, pk):
     if request.user != job.recruiter:
         return HttpResponseForbidden("Bạn không có quyền chỉnh sửa công việc này.")
         
-    form = JobPostForm(instance=job) # Khởi tạo mặc định
+    form = JobPostForm(instance=job) 
     
     if request.method == 'POST':
         form = JobPostForm(request.POST, instance=job)
@@ -156,3 +275,21 @@ def mark_notification_read(request, pk):
         notif.save()
         return redirect(notif.link) if notif.link else redirect('recruiter_dashboard')
     return redirect('recruiter_dashboard')
+
+@login_required
+def edit_company(request):
+    company = CompanyProfile.objects.filter(user = request.user).first()
+    if request.method == 'POST':
+        form = CompanyForm(request.POST, instance=company)
+        
+        if form.is_valid():
+            # Khoan lưu vội, lấy dữ liệu ra trước để gắn user vào (đề phòng trường hợp Tạo mới)
+            new_company = form.save(commit=False)
+            new_company.user = request.user 
+            new_company.save()
+            return redirect('recruiter_dashboard') # Lưu xong thì quay về Dashboard
+    else:
+        # Nếu là request GET (vào xem trang), thì hiển thị form với dữ liệu cũ (nếu có)
+        form = CompanyForm(instance=company)
+
+    return render(request, 'edit_company.html', {'form': form})
