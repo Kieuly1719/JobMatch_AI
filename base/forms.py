@@ -130,13 +130,26 @@ class CandidateProfileForm(forms.ModelForm):
 class CompanyForm(forms.ModelForm):
     class Meta:
         model = CompanyProfile
-        fields = ['name', 'website', 'address'] 
-        
-        # Nhúng class Tailwind CSS để giao diện mượt mà
+        fields = ['name', 'website', 'address', 'logo']
+
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-primary focus:border-primary block p-3 outline-none transition', 'placeholder': 'Nhập tên công ty...'}),
-            
-            'website': forms.URLInput(attrs={'class': 'w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-primary focus:border-primary block p-3 outline-none transition', 'placeholder': 'https://...'}),
-            
-            'address': forms.TextInput(attrs={'class': 'w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-primary focus:border-primary block p-3 outline-none transition', 'placeholder': 'Số nhà, Tên đường, Quận, TP...'}),
+            'name': forms.TextInput(attrs={
+                'class': 'w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-primary focus:border-primary block p-3 outline-none transition',
+                'placeholder': 'Nhập tên công ty...'
+            }),
+
+            'website': forms.URLInput(attrs={
+                'class': 'w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-primary focus:border-primary block p-3 outline-none transition',
+                'placeholder': 'https://...'
+            }),
+
+            'address': forms.TextInput(attrs={
+                'class': 'w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-primary focus:border-primary block p-3 outline-none transition',
+                'placeholder': 'Số nhà, Tên đường, Quận, TP...'
+            }),
+
+            'logo': forms.FileInput(attrs={
+                'class': 'hidden',
+                'id': 'id_logo'
+            })
         }
