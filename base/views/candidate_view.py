@@ -8,6 +8,8 @@ from django.db.models import Q
 import google.generativeai as genai
 import json
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Q
+from django.shortcuts import render, redirect
 
 
 genai.configure(api_key="AIzaSyAKXxMG7wBlwz4JD5srpMdfZukIV6GLBw0")
@@ -33,25 +35,42 @@ def ask_ai(request):
             
     return JsonResponse({'success': False, 'error': 'Lỗi phương thức'})
 @login_required(login_url='login')
-def candidate_dashboard(request):
-    toast = request.session.pop("toast", None)
-    
 
-    if request.user.role != 'candidate':
-        return redirect('recruiter_dashboard')
-    my_applications = Application.objects.filter(candidate=request.user).order_by('-applied_at')
-    jobs = JobPost.objects.all().order_by('-created_at')
-    query = request.GET.get('q')
+
+def candidate_dashboard(request):
+
+    toast = request.session.pop("toast", None)
+
+    # Chặn recruiter vào dashboard candidate
+    if request.user.role != "candidate":
+        return redirect("recruiter_dashboard")
+
+    # Job list
+    jobs = JobPost.objects.all().order_by("-created_at")
+
+    # Search query
+    query = request.GET.get("q", "").strip()
+
     if query:
         jobs = jobs.filter(
-            Q(title__icontains = query)|
-            Q(location__icontains = query)
+            Q(title__icontains=query) |
+            Q(location__icontains=query) |
+            Q(company_name__icontains=query)
         )
+
+    # Applications của user
+    my_applications = Application.objects.filter(
+        candidate=request.user
+    ).order_by("-applied_at")
+
     context = {
-        'jobs': jobs,
+        "jobs": jobs[:12],  # limit để dashboard nhẹ
+        "query": query,
+        "applications_count": my_applications.count(),
         "toast": toast
     }
-    return render(request, 'candidate/dashboard.html', context)
+
+    return render(request, "candidate/dashboard.html", context)
 
 def job_detail(request, pk): 
     job = get_object_or_404(JobPost, id=pk)

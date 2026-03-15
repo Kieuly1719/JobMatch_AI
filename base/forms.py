@@ -119,9 +119,10 @@ class CandidateProfileForm(forms.ModelForm):
                 'placeholder': 'Ví dụ: Python, Django, SQL...'
             }),
 
-            'avatar': forms.ClearableFileInput(attrs={
-                'class': 'block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 dark:file:bg-slate-800 dark:file:text-slate-300'
-            }),
+           'avatar': forms.FileInput(attrs={
+    'id': 'id_avatar',
+    'class': 'hidden'
+}),
 
             'cv_file': forms.ClearableFileInput(attrs={
                 'class': 'block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 dark:file:bg-slate-800 dark:file:text-slate-300'
