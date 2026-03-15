@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from base.models import JobPost, Application, CandidateProfile, Notification
+from base.models import CompanyProfile, JobPost, Application, CandidateProfile, Notification
 from base.forms import CandidateProfileForm
 from django.db.models import Q
 import google.generativeai as genai
@@ -10,7 +10,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from django.shortcuts import render, redirect
-
+from django.db.models import Q, Count
 
 genai.configure(api_key="AIzaSyAKXxMG7wBlwz4JD5srpMdfZukIV6GLBw0")
 @csrf_exempt
@@ -34,21 +34,17 @@ def ask_ai(request):
             return JsonResponse({'success': True, 'reply': error_msg})
             
     return JsonResponse({'success': False, 'error': 'Lỗi phương thức'})
-@login_required(login_url='login')
 
-
+login_required(login_url='login')
 def candidate_dashboard(request):
 
     toast = request.session.pop("toast", None)
 
-    # Chặn recruiter vào dashboard candidate
     if request.user.role != "candidate":
         return redirect("recruiter_dashboard")
 
-    # Job list
     jobs = JobPost.objects.all().order_by("-created_at")
 
-    # Search query
     query = request.GET.get("q", "").strip()
 
     if query:
@@ -58,13 +54,16 @@ def candidate_dashboard(request):
             Q(company_name__icontains=query)
         )
 
-    # Applications của user
     my_applications = Application.objects.filter(
         candidate=request.user
     ).order_by("-applied_at")
 
+    # lấy công ty
+    companies = CompanyProfile.objects.all()[:6]
+
     context = {
-        "jobs": jobs[:12],  # limit để dashboard nhẹ
+        "jobs": jobs[:12],
+        "companies": companies,
         "query": query,
         "applications_count": my_applications.count(),
         "toast": toast
