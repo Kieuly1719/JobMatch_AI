@@ -1,0 +1,147 @@
+{% extends 'layouts/recruiter_base.html' %}
+
+{% block title %}
+  Quản lý tin tuyển dụng
+{% endblock %}
+
+{% block content %}
+  <div class="flex items-center gap-2 text-sm text-slate-500 mb-6">
+    <a href="{% url 'job_management' %}" class="hover:text-primary">Tin tuyển dụng</a>
+
+    <span class="material-symbols-outlined text-xs">chevron_right</span>
+
+    <span class="text-slate-900 font-medium">Quản lý tin tuyển dụng</span>
+  </div>
+  <div class="space-y-8">
+    <!-- Title + CTA -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div>
+        <h1 class="text-3xl font-black text-slate-900 dark:text-white">Quản lý tin tuyển dụng</h1>
+
+        <p class="text-slate-500 text-sm mt-1">Theo dõi và cập nhật các vị trí đang tuyển dụng tại công ty của bạn</p>
+      </div>
+
+      <a href="{% url 'create_job' %}" class="flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl shadow-lg shadow-primary/30 transition">
+        <span class="material-symbols-outlined">add</span>
+        Đăng tin mới
+      </a>
+    </div>
+
+    <!-- FILTER -->
+    <div class="bg-white p-1.5 rounded-xl border border-primary/10 inline-flex shadow-sm">
+      <a href="{% url 'job_management' %}"
+        class="px-6 py-2 rounded-lg text-sm font-bold
+{% if not status %}
+          bg-primary/10 text-primary
+        {% else %}
+          text-slate-500
+        {% endif %}">
+        Tất cả ({{ jobs.count }})
+      </a>
+
+      <a href="?status=active"
+        class="px-6 py-2 rounded-lg text-sm
+{% if status == 'active' %}
+          bg-primary/10 text-primary
+        {% else %}
+          text-slate-500
+        {% endif %}">
+        Đang hoạt động
+      </a>
+
+      <a href="?status=expired"
+        class="px-6 py-2 rounded-lg text-sm
+{% if status == 'expired' %}
+          bg-primary/10 text-primary
+        {% else %}
+          text-slate-500
+        {% endif %}">
+        Hết hạn
+      </a>
+
+      <a href="?status=draft"
+        class="px-6 py-2 rounded-lg text-sm
+{% if status == 'draft' %}
+          bg-primary/10 text-primary
+        {% else %}
+          text-slate-500
+        {% endif %}">
+        Bản nháp
+      </a>
+    </div>
+
+    <!-- JOB TABLE -->
+
+    <div class="bg-white border border-primary/10 rounded-2xl shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left">
+          <thead>
+            <tr class="bg-slate-50 border-b border-primary/10">
+              <th class="px-6 py-4 text-xs font-bold uppercase text-slate-500">Vị trí tuyển dụng</th>
+
+              <th class="px-6 py-4 text-xs font-bold uppercase text-slate-500">Ngày đăng</th>
+
+              <th class="px-6 py-4 text-xs font-bold uppercase text-slate-500">Trạng thái</th>
+
+              <th class="px-6 py-4 text-xs font-bold uppercase text-slate-500">Ứng viên</th>
+
+              <th class="px-6 py-4 text-right text-xs font-bold uppercase text-slate-500">Thao tác</th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y divide-primary/5">
+            {% for job in jobs %}
+              <tr class="hover:bg-slate-50">
+                <td class="px-6 py-5">
+                  <div class="flex flex-col">
+                    <span class="font-bold text-slate-900">{{ job.title }}</span>
+
+                    <span class="text-xs text-slate-500">{{ job.location }}</span>
+                  </div>
+                </td>
+
+                <td class="px-6 py-5 text-sm text-slate-600">{{ job.created_at|date:'d/m/Y' }}</td>
+
+                <td class="px-6 py-5">
+                  {% if job.is_active %}
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-600 text-xs font-bold">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                      Active
+                    </span>
+                  {% else %}
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-500 text-xs font-bold">
+                      <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                      Expired
+                    </span>
+                  {% endif %}
+                </td>
+
+                <td class="px-6 py-5">
+                  <div class="flex items-center gap-2">
+                    <span class="font-bold">{{ job.applications.count }}</span>
+
+                    <span class="text-xs text-slate-400">hồ sơ</span>
+                  </div>
+                </td>
+
+                <td class="px-6 py-5 text-right">
+                  <div class="flex justify-end gap-2">
+                    <a href="{% url 'recruiter_job_detail' job.id %}" class="p-2 text-slate-400 hover:text-primary"><span class="material-symbols-outlined text-[20px]">visibility</span></a>
+
+                    <a href="{% url 'update_job' job.id %}" class="p-2 text-slate-400 hover:text-blue-500"><span class="material-symbols-outlined text-[20px]">edit</span></a>
+
+                    <button onclick="openDeleteModal('{{ job.id }}','{{ job.title }}')" class="p-2 text-slate-400 hover:text-red-500"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+                  </div>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="5" class="text-center py-10 text-slate-400">Bạn chưa đăng tin tuyển dụng nào</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -2,15 +2,17 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from base.models import JobPost, Application, CandidateProfile, Notification
+from base.models import CompanyProfile, JobPost, Application, CandidateProfile, Notification
 from base.forms import CandidateProfileForm
 from django.db.models import Q
 import google.generativeai as genai
 import json
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Q
+from django.shortcuts import render, redirect
+from django.db.models import Q, Count
 
-
-genai.configure(api_key="AIzaSyBNQE4IyN6irF98ufgqX4Vi0Y2fDiyY7gc")
+genai.configure(api_key="AIzaSyAKXxMG7wBlwz4JD5srpMdfZukIV6GLBw0")
 @csrf_exempt
 def ask_ai(request):
     if request.method == "POST":
@@ -18,7 +20,7 @@ def ask_ai(request):
             data = json.loads(request.body)
             user_message = data.get('message', '')
 
-            genai.configure(api_key="AIzaSyBnWGOhyUZXJY3nzao2SiktaMcgBPiiZ9c")
+            genai.configure(api_key="AIzaSyAKXxMG7wBlwz4JD5srpMdfZukIV6GLBw0")
             
             model = genai.GenerativeModel(model_name="gemini-2.5-flash")
             
@@ -32,26 +34,42 @@ def ask_ai(request):
             return JsonResponse({'success': True, 'reply': error_msg})
             
     return JsonResponse({'success': False, 'error': 'Lỗi phương thức'})
-@login_required(login_url='login')
-def candidate_dashboard(request):
-    toast = request.session.pop("toast", None)
-    
 
-    if request.user.role != 'candidate':
-        return redirect('recruiter_dashboard')
-    my_applications = Application.objects.filter(candidate=request.user).order_by('-applied_at')
-    jobs = JobPost.objects.all().order_by('-created_at')
-    query = request.GET.get('q')
+login_required(login_url='login')
+def candidate_dashboard(request):
+
+    toast = request.session.pop("toast", None)
+
+    if request.user.role != "candidate":
+        return redirect("recruiter_dashboard")
+
+    jobs = JobPost.objects.all().order_by("-created_at")
+
+    query = request.GET.get("q", "").strip()
+
     if query:
         jobs = jobs.filter(
-            Q(title__icontains = query)|
-            Q(location__icontains = query)
+            Q(title__icontains=query) |
+            Q(location__icontains=query) |
+            Q(company_name__icontains=query)
         )
+
+    my_applications = Application.objects.filter(
+        candidate=request.user
+    ).order_by("-applied_at")
+
+    # lấy công ty
+    companies = CompanyProfile.objects.all()
+
     context = {
-        'jobs': jobs,
+        "jobs": jobs,
+        "companies": companies,
+        "query": query,
+        "applications_count": my_applications.count(),
         "toast": toast
     }
-    return render(request, 'candidate/dashboard.html', context)
+
+    return render(request, "candidate/dashboard.html", context)
 
 def job_detail(request, pk): 
     job = get_object_or_404(JobPost, id=pk)

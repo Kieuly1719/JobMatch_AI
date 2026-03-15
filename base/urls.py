@@ -3,6 +3,9 @@ from base import views
 from base.views import auth_view
 from base.views import candidate_view
 from base.views import recruiter_view
+from job_portal import settings
+
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('', auth_view.home, name='home'),
@@ -24,4 +27,27 @@ urlpatterns = [
     path('notif/<int:pk>/read/', recruiter_view.mark_notification_read, name='mark_notif_read'),
     path('api/ask-ai/', candidate_view.ask_ai, name='ask_ai'),
     path('company/edit/', recruiter_view.edit_company, name='edit_company'),
+    path(
+    "recruiter/jobs/<int:id>/",
+    views.recruiter_job_detail,
+    name="recruiter_job_detail"
+),
+    path(
+    "recruiter/jobs/",
+    views.job_management,
+    name="job_management"
+),
+    path(
+    "recruiter/candidates/",
+    views.recruiter_candidates,
+    name="recruiter_candidates"
+),
+    path(
+    "recruiter/company/",
+    views.company_profile,
+    name="company_profile"
+)
 ]
+# SERVE MEDIA FILES
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

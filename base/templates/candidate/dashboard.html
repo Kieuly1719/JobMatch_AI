@@ -1,128 +1,387 @@
-{% extends "base.html" %}
-{% block title %}Dashboard - Candidate{% endblock %}
+{% extends 'base.html' %}
+
+{% block title %}
+Dashboard - Candidate
+{% endblock %}
 
 {% block content %}
 
 <section class="px-6 md:px-10 lg:px-20 py-12">
-    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
 
-        <!-- LEFT SIDE -->
-        <div class="lg:col-span-2 space-y-10">
+<div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
 
-            <!-- Greeting -->
-            <div class="mb-8">
-        <div class="bg-white border border-slate-200 rounded-full py-2 px-4 flex items-center shadow-sm w-fit max-w-full overflow-hidden">
-            <div class="relative mr-3 flex-shrink-0">
-                <span class="material-symbols-outlined text-yellow-500 text-2xl">notifications_active</span>
-                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1 rounded-full border-2 border-white">2</span>
-            </div>
+<!-- LEFT SIDE -->
+<div class="lg:col-span-2 space-y-10">
 
-            <h1 class="text-base md:text-lg font-medium text-slate-700 whitespace-nowrap overflow-hidden text-ellipsis">
-                <span class="font-bold">Ứng tuyển 1 chạm</span> - Mọi lúc mọi nơi 
-                <span class="ml-2 font-black text-slate-900">Job Match AI: Tìm Việc Nhanh</span>
-            </h1>
+<!-- Greeting -->
+<div>
+<div class="bg-white border border-slate-200 rounded-full py-2 px-4 flex items-center shadow-sm w-fit">
 
-        </div>
-    </div>
+<div class="relative mr-3">
+<span class="material-symbols-outlined text-yellow-500 text-2xl">
+notifications_active
+</span>
 
-        <!-- Recommended Jobs -->
-        <div>
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold">Gợi ý dành riêng cho bạn</h2>
-                <a href="#" class="text-primary text-sm font-semibold hover:underline">
-                    Xem tất cả →
-                </a>
-            </div>
+<span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1 rounded-full border-2 border-white">
+2
+</span>
+</div>
 
-            <div class="grid md:grid-cols-2 gap-6">
-
-                {% for job in jobs %}
-                <div class="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl transition border border-slate-100">
-
-                    <h3 class="font-bold text-lg mb-1">
-                        {{ job.title }}
-                    </h3>
-
-                    <p class="text-sm text-slate-500 mb-3">
-                        {{ job.company_name }} • {{ job.location }}
-                    </p>
-
-                    <div class="flex flex-wrap gap-2 mb-4 text-xs">
-                        <span class="bg-slate-100 px-3 py-1 rounded">
-                            {{ job.salary_range }}
-                        </span>
-                        <span class="bg-slate-100 px-3 py-1 rounded">
-                            Hạn: {{ job.deadline|date:"d/m/Y" }}
-                        </span>
-                    </div>
-
-                    <div class="flex justify-between items-center">
-                        <a href="{% url 'job_detail' job.id %}"
-                           class="text-primary font-semibold text-sm">
-                            Xem chi tiết
-                        </a>
-
-                        <form action="{% url 'apply_job' job.id %}" method="POST">
-                            {% csrf_token %}
-                            <button class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-primary/90 transition">
-                                Ứng tuyển
-                            </button>
-                        </form>
-                    </div>
-
-                </div>
-                {% empty %}
-                <p class="text-slate-400">Hiện chưa có công việc nào.</p>
-                {% endfor %}
-
-            </div>
-        </div>
-
-    </div>
-
-    <!-- RIGHT SIDE - QUICK STATS -->
-    <div class="space-y-6">
-
-        <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-100">
-            <h3 class="font-bold text-lg mb-6">Thống kê nhanh</h3>
-
-            <div class="space-y-4">
-
-                <div class="flex justify-between items-center bg-primary/5 p-4 rounded-xl">
-                    <div>
-                        <p class="text-sm text-slate-500">Đang ứng tuyển</p>
-                        <p class="text-2xl font-bold">{{ applications_count }}</p>
-                    </div>
-                    <span class="material-symbols-outlined text-primary">work_history</span>
-                </div>
-
-                <div class="flex justify-between items-center bg-green-500/5 p-4 rounded-xl">
-                    <div>
-                        <p class="text-sm text-slate-500">Lượt xem hồ sơ</p>
-                        <p class="text-2xl font-bold">{{ profile_views }}</p>
-                    </div>
-                    <span class="material-symbols-outlined text-green-600">visibility</span>
-                </div>
-
-                <div class="flex justify-between items-center bg-blue-500/5 p-4 rounded-xl">
-                    <div>
-                        <p class="text-sm text-slate-500">Việc đã lưu</p>
-                        <p class="text-2xl font-bold">{{ saved_jobs_count }}</p>
-                    </div>
-                    <span class="material-symbols-outlined text-blue-600">bookmark</span>
-                </div>
-
-            </div>
-
-            <a href="{% url 'my_profile' %}"
-               class="block text-center mt-6 py-3 border border-primary text-primary font-bold rounded-xl hover:bg-primary/5 transition">
-                Xem hồ sơ
-            </a>
-        </div>
-
-    </div>
+<h1 class="text-base md:text-lg font-medium text-slate-700">
+<span class="font-bold">Ứng tuyển 1 chạm</span>
+<span class="ml-2 font-black text-slate-900">
+Job Match AI
+</span>
+</h1>
 
 </div>
-</section>
+</div>
 
+
+<!-- SEARCH JOB -->
+<div>
+
+<form method="GET">
+
+<div class="flex flex-col md:flex-row bg-white rounded-2xl shadow-xl border border-primary/20 overflow-hidden">
+
+<!-- KEYWORD -->
+<div class="flex-1 flex items-center px-6 py-4 gap-3 border-b md:border-b-0 md:border-r">
+
+<span class="material-symbols-outlined text-primary">
+search
+</span>
+
+<input
+type="text"
+name="q"
+value="{{ query }}"
+placeholder="Tìm công việc..."
+class="w-full border-none focus:ring-0 text-sm"
+/>
+
+{% if query %}
+<a href="{% url 'candidate_dashboard' %}"
+class="text-primary text-sm font-semibold">
+Xóa
+</a>
+{% endif %}
+
+</div>
+
+
+<!-- LOCATION -->
+<div class="flex-1 flex items-center px-6 py-4 gap-3 border-b md:border-b-0 md:border-r">
+
+<span class="material-symbols-outlined text-primary"> location_on </span>
+
+<input
+type="text"
+name="location"
+value="{{ request.GET.location }}"
+placeholder="Thành phố..."
+class="w-full border-none focus:ring-0 text-sm"
+/>
+
+</div>
+
+
+<!-- BUTTON -->
+<div class="p-2">
+
+<button
+type="submit"
+class="bg-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-primary/90 transition">
+
+<span class="material-symbols-outlined text-sm mr-1">
+search
+</span>
+
+Tìm việc
+
+</button>
+
+</div>
+
+</div>
+
+</form>
+
+</div>
+
+
+
+<!-- RECOMMENDED JOBS -->
+<div>
+
+<div class="flex justify-between items-center mb-6">
+
+<h2 class="text-2xl font-bold">
+Gợi ý dành riêng cho bạn
+</h2>
+
+</div>
+
+
+<div class="grid md:grid-cols-2 gap-6">
+
+{% for job in jobs %}
+
+<div class="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl transition border border-slate-100">
+
+<h3 class="font-bold text-lg mb-1">
+{{ job.title }}
+</h3>
+
+<p class="text-sm text-slate-500 mb-3">
+{{ job.company_name }} • {{ job.location }}
+</p>
+
+<div class="flex flex-wrap gap-2 mb-4 text-xs">
+
+{% if job.salary_range %}
+<span class="bg-slate-100 px-3 py-1 rounded">
+{{ job.salary_range }}
+</span>
+{% endif %}
+
+{% if job.deadline %}
+<span class="bg-slate-100 px-3 py-1 rounded">
+Hạn: {{ job.deadline|date:"d/m/Y" }}
+</span>
+{% endif %}
+
+</div>
+
+<div class="flex justify-between items-center">
+
+<a href="{% url 'job_detail' job.id %}"
+class="text-primary font-semibold text-sm">
+Xem chi tiết
+</a>
+
+<form action="{% url 'apply_job' job.id %}" method="POST">
+{% csrf_token %}
+
+<button class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-primary/90 transition">
+Ứng tuyển
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+{% empty %}
+
+<p class="text-slate-400">
+Hiện chưa có công việc nào.
+</p>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+
+
+<!-- TOP COMPANIES -->
+<div>
+
+<h2 class="text-2xl font-bold mb-6">
+Công ty đang tuyển dụng
+</h2>
+
+<div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+
+{% for company in companies %}
+
+<div class="bg-white p-5 rounded-xl border border-slate-100 hover:shadow-lg transition text-center">
+
+<div class="w-14 h-14 mx-auto mb-3 bg-slate-100 rounded-xl flex items-center justify-center overflow-hidden">
+
+{% if company.logo %}
+<img src="{{ company.logo.url }}"
+class="w-10 h-10 object-contain">
+{% else %}
+<span class="material-symbols-outlined text-slate-400">
+domain
+</span>
+{% endif %}
+
+</div>
+
+<h3 class="text-sm font-bold">
+{{ company.name }}
+</h3>
+
+<p class="text-xs text-slate-500 mt-1">
+{{ company.address }}
+</p>
+
+</div>
+
+{% empty %}
+
+<p class="text-slate-400">
+Chưa có công ty nào
+</p>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- RIGHT SIDE -->
+<div class="space-y-6">
+
+<div class="bg-white p-6 rounded-2xl shadow-md border border-slate-100">
+
+<h3 class="font-bold text-lg mb-6">
+Thống kê nhanh
+</h3>
+
+<div class="space-y-4">
+
+
+<!-- APPLICATION -->
+<div class="flex justify-between items-center bg-primary/5 p-4 rounded-xl">
+
+<div>
+<p class="text-sm text-slate-500">
+Đang ứng tuyển
+</p>
+
+<p class="text-2xl font-bold">
+{{ applications_count }}
+</p>
+</div>
+
+<span class="material-symbols-outlined text-primary">
+work_history
+</span>
+
+</div>
+
+
+<!-- PROFILE VIEWS -->
+<div class="flex justify-between items-center bg-green-500/5 p-4 rounded-xl">
+
+<div>
+<p class="text-sm text-slate-500">
+Lượt xem hồ sơ
+</p>
+
+<p class="text-2xl font-bold">
+{{ profile_views }}
+</p>
+</div>
+
+<span class="material-symbols-outlined text-green-600">
+visibility
+</span>
+
+</div>
+
+
+<!-- SAVED JOBS -->
+<div class="flex justify-between items-center bg-blue-500/5 p-4 rounded-xl">
+
+<div>
+<p class="text-sm text-slate-500">
+Việc đã lưu
+</p>
+
+<p class="text-2xl font-bold">
+{{ saved_jobs_count }}
+</p>
+</div>
+
+<span class="material-symbols-outlined text-blue-600">
+bookmark
+</span>
+
+</div>
+
+
+</div>
+
+<a href="{% url 'my_profile' %}"
+class="block text-center mt-6 py-3 border border-primary text-primary font-bold rounded-xl hover:bg-primary/5 transition">
+Xem hồ sơ
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+<script>
+
+/* =============================
+   AUTO FOCUS SEARCH INPUT
+============================= */
+
+document.addEventListener("DOMContentLoaded", function(){
+
+    const searchInput = document.querySelector("input[name='q']")
+
+    if(searchInput){
+        searchInput.focus()
+    }
+
+})
+
+
+/* =============================
+   ENTER SEARCH (UX tốt hơn)
+============================= */
+
+const searchField = document.querySelector("input[name='q']")
+
+if(searchField){
+
+    searchField.addEventListener("keydown", function(e){
+
+        if(e.key === "Enter"){
+            e.target.closest("form").submit()
+        }
+
+    })
+
+}
+
+
+/* =============================
+   JOB CARD HOVER EFFECT
+============================= */
+
+const jobCards = document.querySelectorAll(".job-card")
+
+jobCards.forEach(card => {
+
+    card.addEventListener("mouseenter", () => {
+        card.classList.add("scale-[1.02]")
+    })
+
+    card.addEventListener("mouseleave", () => {
+        card.classList.remove("scale-[1.02]")
+    })
+
+})
+
+
+
+
+
+</script>
 {% endblock %}

@@ -1,89 +1,117 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>Xem CV: {{ profile.full_name }}</title>
-    <style>
-        body { margin: 0; font-family: sans-serif; display: flex; height: 100vh; overflow: hidden; }
-        
-        /* CỘT TRÁI: THÔNG TIN */
-        .sidebar { width: 30%; background: #f8f9fa; padding: 20px; border-right: 1px solid #ddd; display: flex; flex-direction: column; overflow-y: auto; }
-        .sidebar h2 { margin-top: 0; color: #333; }
-        .info-group { margin-bottom: 20px; }
-        .label { font-weight: bold; color: #666; font-size: 0.9em; }
-        .value { margin-top: 5px; color: #333; }
-        
-        .actions { margin-top: auto; padding-top: 20px; border-top: 1px solid #ddd; }
-        .btn { display: block; width: 100%; padding: 12px; margin-bottom: 10px; text-align: center; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; cursor: pointer; border: none;}
-        .btn-accept { background-color: #28a745; }
-        .btn-reject { background-color: #dc3545; }
-        .btn-back { background-color: #6c757d; }
+{% extends 'layouts/recruiter_base.html' %}
+{% block title %}
+  Xem hồ sơ ứng viên
+{% endblock %}
 
-        /* CỘT PHẢI: PDF VIEWER */
-        .viewer { width: 70%; background: #525659; display: flex; align-items: center; justify-content: center; }
-        iframe { width: 100%; height: 100%; border: none; }
-        
-        .no-preview { color: white; text-align: center; }
-        .download-link { color: #4db8ff; font-size: 1.2em; }
-    </style>
-</head>
-<body>
+{% block content %}
+  <div class="flex items-center gap-2 text-sm text-slate-500 mb-6">
+    <a href="{% url 'recruiter_dashboard' %}" class="hover:text-primary">Dashboard</a>
 
-    <div class="sidebar">
-        <a href="{% url 'job_applicants' application.job.id %}" style="text-decoration: none; color: #666; margin-bottom: 15px;">← Quay lại danh sách</a>
-        
-        <h2>{{ profile.full_name }}</h2>
-        <p style="color: #007bff; font-weight: bold;">{{ profile.job_title }}</p>
+    <span class="material-symbols-outlined text-xs">chevron_right</span>
 
-        <div class="info-group">
-            <div class="label">TRẠNG THÁI HIỆN TẠI</div>
-            <div class="value">
-                {% if application.status == 'Pending' %} <span style="color:orange">⏳ Đang chờ</span>
-                {% elif application.status == 'Accepted' %} <span style="color:green">✅ Đã nhận</span>
-                {% else %} <span style="color:red">❌ Đã loại</span>
-                {% endif %}
-            </div>
-        </div>
+    <a href="{% url 'recruiter_candidates' %}" class="hover:text-primary">Ứng viên</a>
 
-        <div class="info-group">
-            <div class="label">LIÊN HỆ</div>
-            <div class="value">📧 {{ application.candidate.email }}</div>
-            <div class="value">📞 {{ profile.phone_number }}</div>
-            <div class="value">📍 {{ profile.address }}</div>
-        </div>
+    <span class="material-symbols-outlined text-xs">chevron_right</span>
 
-        <div class="info-group">
-            <div class="label">KỸ NĂNG</div>
-            <div class="value">{{ profile.skills }}</div>
-        </div>
-
-        <div class="actions">
-            {% if application.status == 'Pending' %}
-                <a href="{% url 'update_application_status' application.id 'Accepted' %}" class="btn btn-accept">✓ DUYỆT HỒ SƠ</a>
-                <a href="{% url 'update_application_status' application.id 'Rejected' %}" class="btn btn-reject" onclick="return confirm('Chắc chắn loại?')">✗ TỪ CHỐI</a>
-            {% else %}
-                <div style="text-align: center; font-style: italic; color: #888;">Hồ sơ này đã được xử lý.</div>
-            {% endif %}
-        </div>
-    </div>
-
-    <div class="viewer">
-        {% if cv_url %}
-            {% if is_pdf %}
-                <iframe src="{{ cv_url }}" type="application/pdf"></iframe>
-            {% else %}
-                <div class="no-preview">
-                    <h3>Định dạng file này không hỗ trợ xem trước.</h3>
-                    <p>Đây là file Word hoặc file ảnh.</p>
-                    <a href="{{ cv_url }}" class="download-link" download>📥 Tải xuống để xem</a>
+    <span class="text-slate-900 font-medium">{{ profile.full_name }}</span>
+  </div>
+  <div class="flex flex-col md:flex-row max-w-[1400px] mx-auto w-full">
+    <!-- SIDEBAR -->
+    <aside class="w-full md:w-80 lg:w-96 border-r border-neutral-200 bg-white flex flex-col">
+      <div class="p-6 flex flex-col gap-6">
+        <div class="flex flex-col gap-4">
+          <div class="size-24 rounded-xl bg-slate-100 flex items-center justify-center">
+             {% if profile.avatar %}
+                <div>
+                    <img src="{{ profile.avatar.url }}"
+                         class="w-24 h-24 rounded-full object-cover border border-slate-200">
                 </div>
             {% endif %}
-        {% else %}
-            <div class="no-preview">
-                <h3>Ứng viên chưa tải lên CV.</h3>
-            </div>
-        {% endif %}
-    </div>
+                {% if not profile.avatar %}
+                <span class="material-symbols-outlined text-6xl text-slate-300">person</span>
+                {% endif %}
+          </div>
 
-</body>
-</html>
+          <div>
+            <h1 class="text-2xl font-bold">{{ profile.full_name }}</h1>
+
+            <div class="flex items-center gap-2 mt-2">
+              {% if application.status == 'Pending' %}
+                <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded-full">Đang chờ</span>
+              {% elif application.status == 'Accepted' %}
+                <span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">Đã duyệt</span>
+              {% else %}
+                <span class="px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full">Đã từ chối</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTACT -->
+        <div class="flex flex-col gap-4 py-4 border-y">
+          <div>
+            <p class="text-xs text-slate-400 font-bold uppercase">Email</p>
+            <p class="text-sm">{{ application.candidate.email }}</p>
+          </div>
+
+          <div>
+            <p class="text-xs text-slate-400 font-bold uppercase">Số điện thoại</p>
+            <p class="text-sm">{{ profile.phone_number }}</p>
+          </div>
+
+          <div>
+            <p class="text-xs text-slate-400 font-bold uppercase">Địa chỉ</p>
+            <p class="text-sm">{{ profile.address }}</p>
+          </div>
+        </div>
+
+        <!-- SKILLS -->
+        <div>
+          <h3 class="text-xs font-bold uppercase text-slate-400 mb-2">Kỹ năng</h3>
+
+          <p class="text-sm">{{ profile.skills }}</p>
+        </div>
+      </div>
+
+      <!-- ACTION BUTTON -->
+      <div class="mt-auto p-6 flex flex-col gap-3 border-t">
+        {% if application.status == 'Pending' %}
+          <a href="{% url 'update_application_status' application.id 'Accepted' %}" class="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-bold">
+            <span class="material-symbols-outlined">check_circle</span>
+            DUYỆT HỒ SƠ
+          </a>
+
+          <a href="{% url 'update_application_status' application.id 'Rejected' %}" onclick="return confirm('Từ chối ứng viên này?')" class="flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg font-bold">
+            <span class="material-symbols-outlined">cancel</span>
+            TỪ CHỐI
+          </a>
+        {% else %}
+          <p class="text-center text-sm text-slate-400 italic">Hồ sơ này đã được xử lý</p>
+        {% endif %}
+      </div>
+    </aside>
+
+    <!-- CV VIEWER -->
+    <section class="flex-1 bg-slate-50 p-6 flex items-center justify-center">
+      {% if cv_url %}
+        {% if is_pdf %}
+          <iframe src="{{ cv_url }}" class="w-full h-[85vh] rounded-xl border bg-white"></iframe>
+        {% else %}
+          <div class="text-center">
+            <div class="text-6xl text-slate-300 mb-4">
+              <span class="material-symbols-outlined text-6xl">description</span>
+            </div>
+
+            <h2 class="text-lg font-semibold mb-2">Không thể xem trước định dạng này</h2>
+
+            <p class="text-slate-500 mb-6">Đây có thể là file Word hoặc hình ảnh.</p>
+
+            <a href="{{ cv_url }}" download class="bg-primary text-white px-6 py-3 rounded-lg font-bold hover:opacity-90">Tải xuống để xem</a>
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="text-center text-slate-400">Ứng viên chưa tải CV</div>
+      {% endif %}
+    </section>
+  </div>
+{% endblock %}

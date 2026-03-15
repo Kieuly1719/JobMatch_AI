@@ -1,8 +1,10 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="vi" class="light">
+<html lang="vi">
   <head>
-    <meta charset="UTF-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>
       {% block title %}
         Recruiter Dashboard
@@ -11,8 +13,10 @@
 
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+    <!-- FIX ICON -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
     <script>
       tailwind.config = {
@@ -20,8 +24,8 @@
         theme: {
           extend: {
             colors: {
-              primary: '#ee862b',
-              'background-light': '#fcfaf8',
+              primary: '#f2984a',
+              'background-light': '#f8f7f6',
               'background-dark': '#221810'
             },
             fontFamily: {
@@ -31,69 +35,121 @@
         }
       }
     </script>
+
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+    </style>
   </head>
-{% include "components/toast.html" %}
-  <body class="bg-background-light font-display text-slate-900 min-h-screen">
-    <div class="flex h-screen overflow-hidden">
+
+  <body class="bg-background-light font-display text-slate-900">
+    <div class="flex min-h-screen">
       <!-- SIDEBAR -->
-      <aside class="w-64 border-r border-primary/10 bg-white flex flex-col">
+
+      <aside class="w-64 border-r border-slate-200 bg-white flex flex-col fixed h-full">
         <div class="p-6 flex items-center gap-3">
-          <div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
-            <span class="material-symbols-outlined">smart_toy</span>
+          <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white">
+            <span class="material-symbols-outlined">rocket_launch</span>
           </div>
-          <h1 class="text-xl font-bold">Job Match AI</h1>
+
+          <div>
+            <h1 class="text-base font-bold">Job Match AI</h1>
+            <p class="text-xs text-slate-500">Hệ thống tuyển dụng</p>
+          </div>
         </div>
 
-        <nav class="flex-1 px-4 space-y-2 py-4">
+        <nav class="flex-1 px-4 space-y-2">
           <a href="{% url 'recruiter_dashboard' %}"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl
-       {% if active == 'dashboard' %}
+            class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium
+{% if active == 'dashboard' %}
               
-            bg-primary/10 text-primary font-semibold
+              
+              
+bg-primary/10 text-primary
+
+
 
             {% else %}
               
-            hover:bg-primary/5 text-slate-600
+              
+              
+text-slate-600 hover:bg-primary/10 hover:text-primary
+
+
 
             {% endif %}">
             <span class="material-symbols-outlined">dashboard</span>
-            <span>Tổng quan</span>
+            Tổng quan
           </a>
 
-          <a href="{% url 'create_job' %}"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl
-       {% if active == 'jobs' %}
+          <a href="{% url 'job_management' %}"
+            class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium
+{% if active == 'jobs' %}
               
-            bg-primary/10 text-primary font-semibold
+              
+              
+bg-primary/10 text-primary
+
+
 
             {% else %}
               
-            hover:bg-primary/5 text-slate-600
+              
+              
+text-slate-600 hover:bg-primary/10 hover:text-primary
+
+
 
             {% endif %}">
             <span class="material-symbols-outlined">work</span>
-            <span>Tin tuyển dụng</span>
+            Tin tuyển dụng
+          </a>
+
+          <a href="{% url 'recruiter_candidates' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-primary/10 hover:text-primary">
+            <span class="material-symbols-outlined">group</span>
+            Ứng viên
+          </a>
+
+          <a href="{% url 'company_profile' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-primary/10 hover:text-primary">
+            <span class="material-symbols-outlined">calendar_today</span>
+            Hồ sơ công ty
+          </a>
+
+          <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-primary/10 hover:text-primary">
+            <span class="material-symbols-outlined">settings</span>
+            Cài đặt
           </a>
         </nav>
 
         <div class="p-4 mt-auto">
-          <a href="{% url 'logout' %}" class="w-full block text-center py-2 bg-slate-200 hover:bg-slate-300 rounded-lg text-sm font-semibold">Đăng xuất</a>
+          <div class="bg-primary/5 rounded-xl p-4 mb-4 border border-primary/20 flex items-center gap-3">
+            <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold">{{ request.user.email|slice:':1'|upper }}</div>
+
+            <div class="flex flex-col">
+              <p class="text-sm font-bold text-slate-800">{{ request.user.email|cut:'@gmail.com'|truncatechars:16 }}</p>
+
+              <p class="text-xs text-slate-500">Nhà tuyển dụng</p>
+            </div>
+          </div>
+
+          <a href="{% url 'logout' %}" class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-600 hover:text-red-500">
+            <span class="material-symbols-outlined">logout</span>
+            Đăng xuất
+          </a>
         </div>
       </aside>
 
       <!-- MAIN CONTENT -->
-      <main class="flex-1 flex flex-col overflow-y-auto">
-        <!-- HEADER -->
-        <!-- <header class="h-16 border-b border-primary/10 bg-white flex items-center justify-between px-8">
-          <h2 class="text-lg font-bold">{{ request.user.email }}</h2>
-        </header> -->
 
-        <!-- PAGE CONTENT -->
-        <div class="p-8">
-          {% block content %}
-          {% endblock %}
-        </div>
+      <main class="ml-64 flex-1 p-8 max-w-6xl">
+        {% block content %}
+
+        {% endblock %}
       </main>
     </div>
+
+    {% include 'components/toast.html' %}
+    {% include 'components/modal.html' %}
   </body>
 </html>

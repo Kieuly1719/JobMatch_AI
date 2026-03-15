@@ -1,0 +1,186 @@
+{% extends 'layouts/recruiter_base.html' %}
+
+{% block title %}
+  Danh sách ứng viên
+{% endblock %}
+
+{% block content %}
+  <div class="flex items-center gap-2 text-sm text-slate-500 mb-6">
+    <a href="{% url 'recruiter_dashboard' %}" class="hover:text-primary">Dashboard</a>
+
+    <span class="material-symbols-outlined text-xs">chevron_right</span>
+
+    <span class="text-slate-900 font-medium">Ứng viên</span>
+  </div>
+
+  <div class="space-y-8">
+
+
+    <div class="flex items-center justify-between">
+      <h1 class="text-3xl font-black">Tổng danh sách ứng viên</h1>
+    </div>
+
+    <!-- STATS -->
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="bg-blue-50 p-4 rounded-xl border">
+        <p class="text-xs font-semibold text-blue-600 uppercase">Mới</p>
+        <h4 class="text-2xl font-bold">{{ stats.new }}</h4>
+      </div>
+
+      <div class="bg-orange-50 p-4 rounded-xl border">
+        <p class="text-xs font-semibold text-orange-600 uppercase">Đang xem xét</p>
+        <h4 class="text-2xl font-bold">{{ stats.reviewing }}</h4>
+      </div>
+
+      <div class="bg-emerald-50 p-4 rounded-xl border">
+        <p class="text-xs font-semibold text-emerald-600 uppercase">Đã duyệt</p>
+        <h4 class="text-2xl font-bold">{{ stats.accepted }}</h4>
+      </div>
+
+      <div class="bg-red-50 p-4 rounded-xl border">
+        <p class="text-xs font-semibold text-red-600 uppercase">Từ chối</p>
+        <h4 class="text-2xl font-bold">{{ stats.rejected }}</h4>
+      </div>
+    </div>
+   <form method="GET" class="flex items-center gap-4 flex-wrap">
+
+  <!-- SEARCH -->
+  <div class="relative flex-1 min-w-[260px]">
+    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+      search
+    </span>
+
+    <input
+      type="text"
+      name="search"
+      value="{{ request.GET.search }}"
+      placeholder="Tìm theo tên hoặc email..."
+      class="w-full pl-10 pr-4 py-2 bg-slate-100 rounded-lg border border-slate-200 focus:ring-2 focus:ring-primary/40"
+    />
+  </div>
+
+  <!-- FILTER JOB -->
+  <select name="job"
+    class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/40">
+
+    <option value="">Tất cả vị trí</option>
+
+    {% for job in jobs %}
+      <option value="{{ job.id }}"
+        {% if request.GET.job == job.id|stringformat:"s" %}selected{% endif %}>
+        {{ job.title }}
+      </option>
+    {% endfor %}
+
+  </select>
+
+
+  <!-- FILTER STATUS -->
+  <select name="status"
+    class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/40">
+
+    <option value="">Trạng thái</option>
+
+    <option value="Pending" {% if request.GET.status == "Pending" %}selected{% endif %}>
+      Mới
+    </option>
+
+    <option value="Accepted" {% if request.GET.status == "Accepted" %}selected{% endif %}>
+      Đã duyệt
+    </option>
+
+    <option value="Rejected" {% if request.GET.status == "Rejected" %}selected{% endif %}>
+      Từ chối
+    </option>
+
+  </select>
+
+
+  <!-- SORT -->
+  <select name="sort"
+    class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/40">
+
+    <option value="newest">Mới nhất</option>
+    <option value="oldest">Cũ nhất</option>
+
+  </select>
+
+
+  <!-- SUBMIT -->
+  <button
+    type="submit"
+    class="px-5 py-2 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-primary/90 transition">
+
+    Lọc
+
+  </button>
+
+</form>
+    <!-- TABLE -->
+
+    <div class="bg-white border rounded-2xl shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left">
+          <thead>
+            <tr class="bg-slate-50 border-b">
+              <th class="px-6 py-4 text-xs font-bold uppercase text-slate-500">Ứng viên</th>
+
+              <th class="px-6 py-4 text-xs font-bold uppercase text-slate-500">Vị trí ứng tuyển</th>
+
+              <th class="px-6 py-4 text-xs font-bold uppercase text-slate-500">Ngày ứng tuyển</th>
+
+              <th class="px-6 py-4 text-xs font-bold uppercase text-slate-500">Trạng thái</th>
+
+              <th class="px-6 py-4 text-right text-xs font-bold uppercase text-slate-500">Hành động</th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y">
+            {% for app in applications %}
+              <tr class="hover:bg-slate-50">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    {% if app.candidate.candidate_profile.avatar %}
+                      <img src="{{ app.candidate.candidate_profile.avatar.url }}" class="size-10 rounded-full object-cover" />
+                    {% else %}
+                      <div class="size-10 rounded-full bg-primary/20 flex items-center justify-center font-bold">{{ app.candidate.candidate_profile.full_name|slice:':1' }}</div>
+                    {% endif %}
+
+                    <div class="flex flex-col">
+                      <span class="font-semibold">{{ app.candidate.candidate_profile.full_name }}</span>
+
+                      <span class="text-xs text-slate-500">{{ app.candidate.email }}</span>
+                    </div>
+                  </div>
+                </td>
+
+                <td class="px-6 py-4 text-sm">{{ app.job.title }}</td>
+
+                <td class="px-6 py-4 text-sm text-slate-500">{{ app.applied_at|date:'d/m/Y' }}</td>
+
+                <td class="px-6 py-4">
+                  {% if app.status == 'Pending' %}
+                    <span class="px-2 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700">Mới</span>
+                  {% elif app.status == 'Accepted' %}
+                    <span class="px-2 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">Đã duyệt</span>
+                  {% else %}
+                    <span class="px-2 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700">Từ chối</span>
+                  {% endif %}
+                </td>
+
+                <td class="px-6 py-4 text-right">
+                  <a href="{% url 'view_application_cv' app.id %}" class="px-3 py-1.5 text-xs font-bold text-primary border border-primary/20 rounded-lg hover:bg-primary/5">Xem hồ sơ</a>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="5" class="text-center py-10 text-slate-400">Chưa có ứng viên nào ứng tuyển</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock %}
