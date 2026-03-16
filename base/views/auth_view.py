@@ -4,9 +4,13 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import AuthenticationForm
 from base.forms import UserRegisterForm
 from base.models import JobPost
+from django.core.paginator import Paginator
 
 def home(request):
     jobs = JobPost.objects.all().order_by('-created_at')
+    paginator = Paginator(jobs, 10)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
     if request.user.is_authenticated:
 
         if request.user.role == "recruiter":
@@ -16,7 +20,7 @@ def home(request):
             return redirect("candidate_dashboard")
 
     return render(request, 'home.html', {
-        'jobs': jobs
+        'jobs': page_obj
     })
 
 def register(request):
