@@ -107,11 +107,11 @@ class CandidateProfileForm(forms.ModelForm):
             }),
 
             'gender': forms.Select(attrs={
-                'class': 'w-full rounded-xl border border-slate-300 focus:border-primary focus:ring-primary px-4 py-3 bg-white dark:bg-slate-800'
+                'class': 'w-full rounded-xl border border-slate-300 focus:border-primary focus:ring-primary px-4 py-3 bg-white dark:bg-slate-800 appearance-none'
             }),
 
             'level': forms.Select(attrs={
-                'class': 'w-full rounded-xl border border-slate-300 focus:border-primary focus:ring-primary px-4 py-3 bg-white dark:bg-slate-800'
+                'class': 'w-full rounded-xl border border-slate-300 focus:border-primary focus:ring-primary px-4 py-3 bg-white dark:bg-slate-800 appearance-none'
             }),
 
             'skills': forms.Textarea(attrs={

@@ -11,7 +11,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.db.models import Q, Count
-
+from django.core.paginator import Paginator
+from django.core.paginator import Paginator
+from django.db.models import Q
 genai.configure(api_key="AIzaSyAKXxMG7wBlwz4JD5srpMdfZukIV6GLBw0")
 @csrf_exempt
 def ask_ai(request):
@@ -43,10 +45,11 @@ def candidate_dashboard(request):
     if request.user.role != "candidate":
         return redirect("recruiter_dashboard")
 
-    jobs = JobPost.objects.all().order_by("-created_at")
-
     query = request.GET.get("q", "").strip()
 
+    jobs = JobPost.objects.all().order_by("-created_at")
+
+    # SEARCH 
     if query:
         jobs = jobs.filter(
             Q(title__icontains=query) |
@@ -54,15 +57,19 @@ def candidate_dashboard(request):
             Q(company_name__icontains=query)
         )
 
+    # PAGINATION
+    paginator = Paginator(jobs, 10)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
     my_applications = Application.objects.filter(
         candidate=request.user
     ).order_by("-applied_at")
 
-    # lấy công ty
-    companies = CompanyProfile.objects.all()[:6]
+    companies = CompanyProfile.objects.all()
 
     context = {
-        "jobs": jobs[:12],
+        "jobs": page_obj,
         "companies": companies,
         "query": query,
         "applications_count": my_applications.count(),

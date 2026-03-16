@@ -44,7 +44,7 @@
 
     {% endblock %}
   </head>
-  {% include "components/toast.html" %}
+ 
 
   <body class="bg-background-light text-slate-900 font-display">
     <!-- HEADER -->
@@ -83,7 +83,7 @@
    {% if request.session.toast %}
     {% include "components/toast.html" with toast=request.session.toast %}
 {% endif %}
-     {% include "components/toast.html" %}
+  
 
     <!-- FOOTER -->
     <footer class="border-t border-primary/10 py-12 mt-20">
@@ -100,7 +100,5 @@
         </div>
       </div>
     </footer>
-    {% block extra_js %}
-    {% endblock %}
   </body>
 </html>
