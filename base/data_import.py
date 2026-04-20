@@ -3,8 +3,7 @@ import re
 from bs4 import BeautifulSoup
 import os
 
-# --- DIEN DUONG DAN FILE CUA BAN O DAY ---
-# Luu y: Dung dau r phia truoc de tranh loi duong dan Windows
+
 input_file = r'f:\JobMatch_AI\data\job_postings.csv' 
 output_file = r'f:\JobMatch_AI\data\jobs_processed.csv'
 
@@ -15,7 +14,7 @@ needed_columns = [
    
 ]
 
-# Dung tieng Anh de khong bi loi Terminal
+
 print("Step 1: Loading data...")
 try:
     # Doc 10,000 dong
@@ -24,7 +23,6 @@ except Exception as e:
     print(f"Error reading file: {e}")
     exit()
 
-# 2. Ham lam sach van ban (Giu nguyen logic cua ban)
 def clean_text(text):
     if not isinstance(text, str): return ""
     # Xoa HTML
