@@ -14,7 +14,7 @@ from django.db.models import Q, Count
 from django.core.paginator import Paginator
 from django.core.paginator import Paginator
 from django.db.models import Q
-genai.configure(api_key="AIzaSyAKXxMG7wBlwz4JD5srpMdfZukIV6GLBw0")
+
 @csrf_exempt
 def ask_ai(request):
     if request.method == "POST":
@@ -22,7 +22,7 @@ def ask_ai(request):
             data = json.loads(request.body)
             user_message = data.get('message', '')
 
-            genai.configure(api_key="AIzaSyAKXxMG7wBlwz4JD5srpMdfZukIV6GLBw0")
+            genai.configure(api_key="AIzaSyBfuStpbnN56tMwcqmSYLgAl4YmyOwyMwM")
             
             model = genai.GenerativeModel(model_name="gemini-2.5-flash")
             
