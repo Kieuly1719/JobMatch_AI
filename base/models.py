@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
+from .utils import clean_text
 class CustomerUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
@@ -93,8 +94,11 @@ class JobPost(models.Model):
 
     interview_count = models.IntegerField(default=0, verbose_name="Số lượng đã nộp hồ sơ")
     full_text_search = models.TextField(blank=True, null=True)
+    cleaned_data = models.TextField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
+        raw_text = f"{self.title} {self.description} {self.requirements}"
+        self.cleaned_data = clean_text(raw_text) # Gọi hàm của bạn ở đây
         self.full_text_search = f"{self.title} {self.description} {self.requirements}"
         super().save(*args, **kwargs)
 
