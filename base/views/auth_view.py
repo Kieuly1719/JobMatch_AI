@@ -5,9 +5,12 @@ from django.contrib.auth.forms import AuthenticationForm
 from base.forms import UserRegisterForm
 from base.models import JobPost
 from django.core.paginator import Paginator
+DATASET_COMPANY_PREFIX = "__DATASET__::"
 
 def home(request):
-    jobs = JobPost.objects.all().order_by('-created_at')
+    jobs = JobPost.objects.exclude(
+        company_name__startswith=DATASET_COMPANY_PREFIX
+    ).order_by('-created_at')
     paginator = Paginator(jobs, 10)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)

@@ -120,3 +120,5 @@ AUTH_USER_MODEL = 'base.User'
 import os
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# Cấu hình khóa chính mặc định cho toàn bộ project
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

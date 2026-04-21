@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from base.models import CompanyProfile, JobPost, Application, CandidateProfile, Notification
 from base.forms import CandidateProfileForm
 from django.db.models import Q
-import google.generativeai as genai
+from google import genai
 import json
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
@@ -14,6 +14,7 @@ from django.db.models import Q, Count
 from django.core.paginator import Paginator
 from django.core.paginator import Paginator
 from django.db.models import Q
+DATASET_COMPANY_PREFIX = "__DATASET__::"
 
 @csrf_exempt
 def ask_ai(request):
@@ -47,7 +48,9 @@ def candidate_dashboard(request):
 
     query = request.GET.get("q", "").strip()
 
-    jobs = JobPost.objects.all().order_by("-created_at")
+    jobs = JobPost.objects.exclude(
+        company_name__startswith=DATASET_COMPANY_PREFIX
+    ).order_by("-created_at")
 
     # SEARCH 
     if query:
@@ -78,12 +81,12 @@ def candidate_dashboard(request):
 
     return render(request, "candidate/dashboard.html", context)
 
-def job_detail(request, pk): 
-    job = get_object_or_404(JobPost, id=pk)
-    context = {
-        'job': job
-    }
-    return render(request, 'recruiter/job_detail.html', context)
+def job_detail(request, pk):
+    job = get_object_or_404(
+        JobPost.objects.exclude(company_name__startswith=DATASET_COMPANY_PREFIX),
+        id=pk
+    )
+    return render(request, "recruiter/job_detail.html", {"job": job})
 
 @login_required(login_url='login')
 def my_application(request):
@@ -115,7 +118,10 @@ def apply_job(request, pk):
     if request.user.role != 'candidate':
         messages.error(request, 'Nhà tuyển dụng không thể ứng tuyển!')
         return redirect('home')
-    job = get_object_or_404(JobPost, id=pk)
+    job = get_object_or_404(
+        JobPost.objects.exclude(company_name__startswith=DATASET_COMPANY_PREFIX),
+        id=pk
+    )
     try:
         profile = request.user.candidate_profile
         if not profile.cv_file:
