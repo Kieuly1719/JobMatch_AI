@@ -8,9 +8,7 @@ import os
 
 input_file = r'E:\Semester6\Laptrinhpython\project\data\formatted_jobs.csv' 
 output_file = r'E:\Semester6\Laptrinhpython\project\data\jobs_processed.csv'
-
 DATASET_COMPANY_PREFIX = "__DATASET__::"
-
 
 def normalize_text(text: str) -> str:
     if pd.isna(text):
