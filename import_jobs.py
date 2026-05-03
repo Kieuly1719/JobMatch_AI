@@ -41,7 +41,6 @@ def import_data_from_csv(file_path):
 
     print("Bat dau import dataset moi vao database...")
 
-    # Xoa dataset jobs da import truoc do theo marker moi
     old_dataset_qs = JobPost.objects.filter(company_name__startswith=DATASET_COMPANY_PREFIX)
     old_count = old_dataset_qs.count()
     if old_count > 0:
