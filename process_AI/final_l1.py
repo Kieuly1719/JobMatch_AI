@@ -1522,6 +1522,7 @@ def extract_experience(sections: dict[str, list[str]]) -> list[dict[str, str]]:
 
         if not job_title and not header_starts_with_number:
             job_title = clean_line_text_and_lower(strip_year_range(header_line))
+
         description_lines = block[1:] if len(block) > 1 else []
         description = " ".join(description_lines).strip()
 
