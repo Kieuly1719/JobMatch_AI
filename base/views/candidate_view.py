@@ -1,51 +1,92 @@
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from base.models import JobPost, Application, CandidateProfile, Notification
+from httpcore import request
+from base.models import CompanyProfile, JobPost, Application, CandidateProfile, Notification
 from base.forms import CandidateProfileForm
 from django.db.models import Q
-import os
-from base.recommendation import get_job_recommendations
+from google import genai
+import json
+from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Q
+from django.shortcuts import render, redirect
+from django.db.models import Q, Count
+from django.core.paginator import Paginator
+from django.core.paginator import Paginator
+from django.db.models import Q
+DATASET_COMPANY_PREFIX = "__DATASET__::"
 
-@login_required(login_url='login')
+@csrf_exempt
+def ask_ai(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            user_message = data.get('message', '')
+
+            genai.configure(api_key="AIzaSyBfuStpbnN56tMwcqmSYLgAl4YmyOwyMwM")
+            
+            model = genai.GenerativeModel(model_name="gemini-2.5-flash")
+            
+            prompt = f"Bạn là trợ lý AI chuyên tư vấn việc làm. Trả lời ngắn gọn: {user_message}"
+            response = model.generate_content(prompt)
+            
+            return JsonResponse({'success': True, 'reply': response.text})
+            
+        except Exception as e:
+            error_msg = f"Lỗi từ Google AI: {str(e)}"
+            return JsonResponse({'success': True, 'reply': error_msg})
+            
+    return JsonResponse({'success': False, 'error': 'Lỗi phương thức'})
+
+login_required(login_url='login')
 def candidate_dashboard(request):
-    if request.user.role != 'candidate':
-        return redirect('recruiter_dashboard')
-    my_applications = Application.objects.filter(candidate=request.user).order_by('-applied_at')
-    jobs = JobPost.objects.filter(recruiter__isnull=False).order_by('-created_at')
-    query = request.GET.get('q')
+
+    toast = request.session.pop("toast", None)
+
+    if request.user.role != "candidate":
+        return redirect("recruiter_dashboard")
+
+    query = request.GET.get("q", "").strip()
+
+    jobs = JobPost.objects.exclude(
+        company_name__startswith=DATASET_COMPANY_PREFIX
+    ).order_by("-created_at")
+
+    # SEARCH 
     if query:
         jobs = jobs.filter(
-            Q(title__icontains = query)|
-            Q(location__icontains = query)
+            Q(title__icontains=query) |
+            Q(location__icontains=query) |
+            Q(company_name__icontains=query)
         )
-    recommended_jobs = []
-    if not query:
-        try:
-            profile = request.user.candidate_profile
-            if profile.cv_file:
-                cv_path = profile.cv_file.path
-                # Kiểm tra file có tồn tại thật không
-                if os.path.exists(cv_path):
-                    # GỌI HÀM AI CỦA BẠN TẠI ĐÂY
-                    # Lấy Top 5 việc làm phù hợp nhất
-                    recommended_jobs = get_job_recommendations(cv_path, top_n=5)
-        except Exception as e:
-            print(f"⚠️ Lỗi phần gợi ý: {e}")
-    
-    context = {
-        'jobs': jobs,                   
-        'recommended_jobs': recommended_jobs, # Danh sách AI gợi ý
-        'query': query
-    }
-    return render(request, 'candidate/dashboard.html', context)
+    # PAGINATION
+    paginator = Paginator(jobs, 10)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
 
-def job_detail(request, pk): 
-    job = get_object_or_404(JobPost, id=pk)
+    my_applications = Application.objects.filter(
+        candidate=request.user
+    ).order_by("-applied_at")
+
+    companies = CompanyProfile.objects.all()
+
     context = {
-        'job': job
+        "jobs": page_obj,
+        "companies": companies,
+        "query": query,
+        "applications_count": my_applications.count(),
+        "toast": toast
     }
-    return render(request, 'recruiter/job_detail.html', context)
+
+    return render(request, "candidate/dashboard.html", context)
+
+def job_detail(request, pk):
+    job = get_object_or_404(
+        JobPost.objects.exclude(company_name__startswith=DATASET_COMPANY_PREFIX),
+        id=pk
+    )
+    return render(request, "recruiter/job_detail.html", {"job": job})
 
 @login_required(login_url='login')
 def my_application(request):
@@ -77,22 +118,34 @@ def apply_job(request, pk):
     if request.user.role != 'candidate':
         messages.error(request, 'Nhà tuyển dụng không thể ứng tuyển!')
         return redirect('home')
-    job = get_object_or_404(JobPost, id=pk)
+    job = get_object_or_404(
+        JobPost.objects.exclude(company_name__startswith=DATASET_COMPANY_PREFIX),
+        id=pk
+    )
     try:
         profile = request.user.candidate_profile
         if not profile.cv_file:
+            request.session["toast"] = {
+                "type": "warning",
+                "message": "Bạn cần upload CV trước khi ứng tuyển!"
+            }
             messages.warning(request, 'Bạn cần upload CV trước khi ứng tuyển!')
             return redirect('my_profile')
         
     except CandidateProfile.DoesNotExist:
-        messages.warning(request, 'Vui lòng cập nhật hồ sơ cá nhân trước!')
+        request.session["toast"] = {
+            "type": "warning",
+            "message": "Bạn cần tạo hồ sơ ứng viên trước khi ứng tuyển!"
+        }
         return redirect('my_profile')
     
     existing_application = Application.objects.filter(job = job, candidate = request.user).exists()
     if existing_application:
-        messages.info(request, 'Bạn đã nộp đơn vào vị trí này rồi.')
+        request.session["toast"] = {
+            "type": "error",
+            "message": "Bạn đã ứng tuyển vào công việc này rồi!"
+        }
         return redirect('job_detail', pk=pk)
-    
     Application.objects.create(
         job=job,
         candidate=request.user,
@@ -103,5 +156,8 @@ def apply_job(request, pk):
         message = f"Hồ sơ mới từ {request.user.candidate_profile.full_name} cho job {job.title}",
         link=f"/job/{job.id}/applicants/"
     )
-    messages.success(request, 'Nộp đơn ứng tuyển thành công! Chúc bạn may mắn.')
+    request.session["toast"] = {
+    "type": "success",
+    "message": "Nộp đơn ứng tuyển thành công! Chúc bạn may mắn."
+}
     return redirect('candidate_dashboard')

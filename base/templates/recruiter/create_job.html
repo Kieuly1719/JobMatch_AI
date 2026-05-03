@@ -1,39 +1,123 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>Đăng Tin Tuyển Dụng</title>
-    <style>
-        body { font-family: sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input, textarea, select { width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box; }
-        button { background-color: #28a745; color: white; padding: 10px 20px; border: none; cursor: pointer; font-size: 16px; border-radius: 5px; }
-        button:hover { background-color: #218838; }
-        .alert { padding: 10px; margin-bottom: 15px; border-radius: 5px; }
-        .alert-error { background-color: #f8d7da; color: #721c24; }
-        .back-link { display: inline-block; margin-bottom: 20px; text-decoration: none; color: #007bff; }
-    </style>
-</head>
-<body>
+{% extends 'layouts/recruiter_base.html' %}
 
-    <a href="{% url 'recruiter_dashboard' %}" class="back-link">← Quay lại Dashboard</a>
+{% block title %}
+  Đăng tin tuyển dụng
+{% endblock %}
 
-    <h2>📝 Đăng Tin Tuyển Dụng Mới</h2>
+{% block content %}
+  <div class="flex items-center gap-2 text-sm text-slate-500 mb-6">
+    <a href="{% url 'job_management' %}" class="hover:text-primary">Tin tuyển dụng</a>
 
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-error">{{ message }}</div>
-        {% endfor %}
+    <span class="material-symbols-outlined text-xs">chevron_right</span>
+
+    <a href="{% url 'job_management' %}" class="hover:text-primary">Quản lý tuyển dụng</a>
+
+    <span class="material-symbols-outlined text-xs">chevron_right</span>
+    {% if form.instance.pk %}
+      <span class="text-slate-900 font-medium">Cập nhật tin</span>
+    {% else %}
+      <span class="text-slate-900 font-medium">Tạo tin</span>
+    {% endif %}
+  </div>
+  <div class="max-w-5xl">
+    {% if form.instance.pk %}
+    <div class="mb-10">
+      <h2 class="text-4xl font-black tracking-tight">Cập Nhật Tin Tuyển Dụng</h2>
+      <p class="text-slate-500 mt-2">Vui lòng cập nhật thông tin cần thiết để cập nhật tin tuyển dụng.</p>
+    </div>
+    {% else %}
+    <div class="mb-10">
+      <h2 class="text-4xl font-black tracking-tight">Tạo Tin Tuyển Dụng Mới</h2>
+      <p class="text-slate-500 mt-2">Vui lòng điền đầy đủ thông tin cần thiết để tạo tin tuyển dụng.</p>
+    </div>
     {% endif %}
 
-    <form method="POST">
-        {% csrf_token %}
-        
-        {{ form.as_p }}
+    <form method="POST" class="space-y-8">
+      {% csrf_token %}
 
-        <button type="submit">Đăng Tin Ngay</button>
+      <!-- BASIC INFO -->
+      <section class="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <div class="p-6 border-b bg-slate-50 flex items-center gap-3">
+          <span class="material-symbols-outlined text-primary">info</span>
+          <h3 class="text-lg font-bold">Thông tin cơ bản</h3>
+        </div>
+
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="text-sm font-semibold">Tên công ty</label>
+            {{ form.company_name }}
+          </div>
+
+          <div>
+            <label class="text-sm font-semibold">Tiêu đề công việc</label>
+            {{ form.title }}
+          </div>
+
+          <div>
+            <label class="text-sm font-semibold">Địa điểm làm việc</label>
+            {{ form.location }}
+          </div>
+
+          <div>
+            <label class="text-sm font-semibold">Hạn nộp hồ sơ</label>
+            {{ form.deadline }}
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="text-sm font-semibold">Mức lương</label>
+            {{ form.salary_range }}
+          </div>
+        </div>
+      </section>
+
+      <!-- JOB DESCRIPTION -->
+
+      <section class="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <div class="p-6 border-b bg-slate-50 flex items-center gap-3">
+          <span class="material-symbols-outlined text-primary">description</span>
+          <h3 class="text-lg font-bold">Chi tiết tuyển dụng</h3>
+        </div>
+
+        <div class="p-6 space-y-6">
+          <div>
+            <label class="text-sm font-semibold">Mô tả công việc</label>
+            {{ form.description }}
+          </div>
+
+          <div>
+            <label class="text-sm font-semibold">Yêu cầu ứng viên</label>
+            {{ form.requirements }}
+          </div>
+        </div>
+      </section>
+
+      <!-- ACTION -->
+
+      <div class="flex justify-end gap-4 pt-4">
+        <a href="{% url 'recruiter_dashboard' %}" class="px-8 py-3 rounded-lg font-bold text-slate-600 hover:bg-slate-200">Hủy</a>
+
+        <button type="submit" class="px-10 py-3 rounded-lg font-bold bg-primary text-white hover:bg-primary/90 shadow-lg">
+          {% if form.instance.pk %}
+            Cập nhật
+          {% else %}
+            Đăng tin
+          {% endif %}
+        </button>
+      </div>
     </form>
 
-</body>
-</html>
+    <!-- AI SUGGESTION -->
+
+    <div class="mt-16 pt-8 border-t">
+      <div class="flex items-start gap-4 p-4 rounded-xl bg-primary/5 border border-primary/10">
+        <span class="material-symbols-outlined text-primary mt-1">auto_awesome</span>
+
+        <div>
+          <p class="text-sm font-bold">Gợi ý từ AI</p>
+
+          <p class="text-sm text-slate-600 mt-1">Hệ thống AI sẽ tự động phân tích và so khớp các ứng viên dựa trên mô tả công việc và yêu cầu bạn đã nhập.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

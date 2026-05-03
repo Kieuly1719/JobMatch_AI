@@ -1,11 +1,30 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import AuthenticationForm
 from base.forms import UserRegisterForm
+from base.models import JobPost
+from django.core.paginator import Paginator
+DATASET_COMPANY_PREFIX = "__DATASET__::"
 
 def home(request):
-    return render(request, 'home.html')
+    jobs = JobPost.objects.exclude(
+        company_name__startswith=DATASET_COMPANY_PREFIX
+    ).order_by('-created_at')
+    paginator = Paginator(jobs, 10)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+    if request.user.is_authenticated:
+
+        if request.user.role == "recruiter":
+            return redirect("recruiter_dashboard")
+
+        elif request.user.role == "candidate":
+            return redirect("candidate_dashboard")
+
+    return render(request, 'home.html', {
+        'jobs': page_obj
+    })
 
 def register(request):
     if request.method == 'POST':
@@ -41,3 +60,7 @@ def login_page(request):
         
     form = AuthenticationForm()
     return render(request, 'accounts/login.html', {'form': form})
+def logout_page(request):
+    logout(request)
+    messages.info(request, "Bạn đã đăng xuất thành công!")
+    return redirect('home')
