@@ -20,8 +20,7 @@
             </div>
 
             <h1 class="text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl">
-              Kết nối sự nghiệp tương lai của bạn với
-              <span class="text-primary">AI</span>
+              Kết nối sự nghiệp tương lai của bạn
             </h1>
 
             <p class="text-lg leading-relaxed text-slate-600">Hệ thống gợi ý việc làm thông minh giúp bạn tìm thấy cơ hội phù hợp nhất.</p>
@@ -80,6 +79,39 @@
           <p class="text-center text-slate-400 mt-8">Hiện chưa có việc làm nào.</p>
         {% endif %}
       </div>
+      {% if jobs.paginator.num_pages > 1 %}
+            <div class="flex justify-center items-center gap-2 flex-wrap mt-10">
+              {% if jobs.has_previous %}
+                <a href="?page={{ jobs.previous_page_number }}&q={{ query }}" class="px-4 py-2 border rounded-lg hover:bg-slate-100 text-sm">← Trước</a>
+              {% endif %}
+
+              {% if jobs.number > 3 %}
+                <a href="?page=1&q={{ query }}" class="px-3 py-2 border rounded-lg hover:bg-slate-100">1</a>
+
+                <span class="px-2">...</span>
+              {% endif %}
+
+              {% for num in jobs.paginator.page_range %}
+                {% if num >= jobs.number|add:'-2' and num <= jobs.number|add:'2' %}
+                  {% if jobs.number == num %}
+                    <span class="px-4 py-2 bg-primary text-white rounded-lg font-bold">{{ num }}</span>
+                  {% else %}
+                    <a href="?page={{ num }}&q={{ query }}" class="px-4 py-2 border rounded-lg hover:bg-slate-100">{{ num }}</a>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+
+              {% if jobs.number < jobs.paginator.num_pages|add:'-2' %}
+                <span class="px-2">...</span>
+
+                <a href="?page={{ jobs.paginator.num_pages }}&q={{ query }}" class="px-3 py-2 border rounded-lg hover:bg-slate-100">{{ jobs.paginator.num_pages }}</a>
+              {% endif %}
+
+              {% if jobs.has_next %}
+                <a href="?page={{ jobs.next_page_number }}&q={{ query }}" class="px-4 py-2 border rounded-lg hover:bg-slate-100 text-sm">Sau →</a>
+              {% endif %}
+            </div>
+          {% endif %}
     </section>
 
     <!-- FEATURES SECTION -->

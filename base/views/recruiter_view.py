@@ -32,7 +32,9 @@ def recruiter_dashboard(request):
 @login_required(login_url='login')
 def company_profile(request):
 
-    company = CompanyProfile.objects.get(user=request.user)
+    company, created = CompanyProfile.objects.get_or_create(
+    user=request.user
+)
 
     edit_mode = request.GET.get("edit")
 
