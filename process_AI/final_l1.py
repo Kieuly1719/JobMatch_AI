@@ -36,7 +36,7 @@ MODULE_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = MODULE_DIR.parent if MODULE_DIR.name in {"base", "process_AI"} else CURRENT_DIR
 if not (PROJECT_ROOT / "data").exists() and (CURRENT_DIR / "data").exists():
     PROJECT_ROOT = CURRENT_DIR
-DATA_DIR = PROJECT_ROOT / "data"
+DATA_DIR = PROJECT_ROOT / "data" / "ai"
 DEFAULT_CV_DIR = PROJECT_ROOT / "media" / "cvs"
 MIN_TEXT_LENGTH_WARNING = 300
 
